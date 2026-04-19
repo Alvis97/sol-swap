@@ -11,7 +11,7 @@ function navigation({children} : {children : ReactNode }) {
     <div className='flex justify-end m-2'>
         <div className='content-center mx-4'>
         <button
-        className='flex card-base w-[105px] p-3 rounded-xl cursor-pointer justify-between items-center'
+        className='flex button-base w-[105px] p-3 rounded-xl cursor-pointer justify-between items-center'
         onClick={()=> setOpen(!open)}
         >
            {selectedNetwork}
@@ -22,7 +22,7 @@ function navigation({children} : {children : ReactNode }) {
         className='absolute flex flex-col mt-1 w-[105px]'
         >
             <button
-                className='card-base w-fill flex items-center p-3 rounded-md'
+                className='button-base w-fill flex items-center p-3 rounded-md'
                 onClick={()=> {
                     setSelectedNetwork(selectedNetwork === "Mainet" ? "Devnet" : "Mainet")  
                     setOpen(false)
