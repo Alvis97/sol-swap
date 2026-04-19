@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Unbounded } from "next/font/google";
 import "./globals.css";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { clusterApiUrl } from "@solana/web3.js";
 import { ReactNode, useMemo } from "react";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-import Providers from "./components/providers";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Navigation from "./components/navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const unbounded = Unbounded ({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["200", "300"],
+  variable: "--font-unbounded",
 });
 
 export const metadata: Metadata = {
@@ -29,12 +21,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${unbounded.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Providers>
+        <Navigation>
           {children}
-        </Providers>
+        </Navigation>
         </body>
     </html>
   );
