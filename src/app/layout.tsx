@@ -24,9 +24,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${unbounded.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navigation>
+        <Navigation children={undefined}/>
           {children}
-        </Navigation>
         </body>
     </html>
   );

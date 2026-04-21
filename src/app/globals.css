@@ -3,7 +3,7 @@
 :root {
   --background: #E7E7E7;
   --foreground: #343434;
-  --hoverColor: #e1dfdf;
+  --hoverColor: #c1c1c1;
 }
 
 @theme inline {
@@ -30,21 +30,53 @@ body {
 
 @layer components {
   .button-base {
-    @apply rounded-2xl transition-all duration-300 hover:bg-[var(--hoverColor)] bg-[var(--background)];
+    @apply rounded-2xl transition-all duration-300 bg-[var(--background)];
 
     box-shadow:
       -6px -6px 12px rgba(255, 255, 255, 0.8),  
        6px  6px 12px rgba(0, 0, 0, 0.25);       
   }
 
- @media (prefers-color-scheme: dark) {
-  .card-base {
+   .button-base:hover {
     box-shadow:
-      -6px -6px 12px rgba(255, 255, 255, 0.10),
+    inset 0 -4px 6px rgba(255,255,255,0.8),
+    inset 0 4px 6px rgba(0,0,0,0.25);
+  }
+
+ @media (prefers-color-scheme: dark) {
+  .button-base {
+    box-shadow:
+      -6px -6px 12px rgba(255, 255, 255, 0.15),
        6px  6px 12px rgba(0, 0, 0, 0.782);
   }
 }
 }
+
+@layer components {
+  .button-submit {
+    @apply rounded-2xl transition-all font-bold tracking-widest duration-300 bg-[var(--background)];
+
+    box-shadow:
+      -6px -6px 12px rgba(255, 255, 255, 0.8),  
+      6px  6px 12px rgba(0, 0, 0, 0.35);       
+  }
+
+  .button-submit:hover {
+    background-color: #959595 !important;
+     box-shadow:
+      -6px -6px 12px rgba(255, 255, 255, 0.8),  
+      6px  6px 12px rgba(0, 0, 0, 0.45);       
+  }
+  }
+
+ @media (prefers-color-scheme: dark) {
+  .button-submit {
+    box-shadow:
+      -6px -6px 12px rgba(255, 255, 255, 0.15),
+       6px  6px 12px rgba(0, 0, 0, 0.782);
+  }
+}
+
 
 
 @layer components {
@@ -54,7 +86,7 @@ body {
   box-shadow:
     -6px -6px 12px rgba(255, 255, 255, 0.6),
      6px  6px 12px rgba(0, 0, 0, 0.163),
-      inset 0 -10px 10px rgba(0, 0, 0, 0.198);
+    inset 0 -10px 10px rgba(0, 0, 0, 0.198);
 }
 
  @media (prefers-color-scheme: dark) {

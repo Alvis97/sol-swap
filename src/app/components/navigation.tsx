@@ -8,7 +8,7 @@ function navigation({children} : {children : ReactNode }) {
     const [open, setOpen] = useState(false);
     const [selectedNetwork, setSelectedNetwork] = useState("Mainet");
   return (
-    <div className='flex justify-end m-2'>
+    <div className='flex fixed top-0 left-0 w-full z-50 justify-end content-center p-2 bg-[var(--background)]'>
         <div className='content-center mx-4'>
         <button
         className='flex button-base w-[105px] p-3 rounded-xl cursor-pointer justify-between items-center'
