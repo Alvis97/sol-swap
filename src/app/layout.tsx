@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Unbounded } from "next/font/google";
 import "./globals.css";
-import { ReactNode, useMemo } from "react";
-import Navigation from "./components/navigation";
+import { ReactNode} from "react";
+import Navigation from "./components/networkSelector";
+import Providers from "./components/providers";
+import NetworkSelector from "./components/networkSelector";
+import AppWrapper from "./components/appWrapper";
 
 const unbounded = Unbounded ({
   subsets: ["latin"],
@@ -23,9 +26,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
       className={`${unbounded.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <Navigation children={undefined}/>
-          {children}
+      <body suppressHydrationWarning className="h-full w-full flex flex-col">
+          <AppWrapper> 
+            {children}
+          </AppWrapper> 
         </body>
     </html>
   );
