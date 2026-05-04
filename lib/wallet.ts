@@ -3,7 +3,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import React from 'react'
 
 // USDC token mint address on mainnet
-const USDC_MINT = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU')
+const USDC_MINT = new PublicKey('Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr')
 
 export async function getSolBalance(publicKey: PublicKey, connection: Connection): Promise<number> {
   const balance = await connection.getBalance(publicKey);

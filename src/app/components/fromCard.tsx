@@ -20,6 +20,8 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     const { connection } = useConnection()
 
     useEffect(() => {
+
+          console.log("publicKey i useEffect:", publicKey?.toString())
  
         if (!publicKey) return;
          
@@ -31,6 +33,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                setBalance(usdcBal)
             } else if (currency === "SOL") {
                 const bal= await getSolBalance(publicKey!, connection);
+                console.log("Solbalance:", bal)
                 setBalance(bal);
             }
         } catch(err) {
