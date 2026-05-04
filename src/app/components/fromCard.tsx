@@ -41,11 +41,11 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     }, [publicKey, connection, currency])
 
   return (
-    <div className='card-base flex flex-col justify-between w-90 h-30 m-4 p-3'>
+    <div className='card-base flex flex-col justify-between w-80 h-30 m-4 p-3'>
         {/* top part */}
-        <div className='flex justify-between items-center text-xs'>
+        <div className='flex justify-between items-start text-xs'>
             <p>From</p>
-            <div className='flex items-center'>
+            <div className='flex items-start'>
                 <p>Balance: {balance}{currency}</p>
                 <button 
                 onClick={()=> {

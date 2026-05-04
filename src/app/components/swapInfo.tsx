@@ -14,7 +14,7 @@ function swapInfo() {
     async function fetchPrice() {
    try{
         const price = await getSolPrices()
-        setCurrentValue(price)
+        setCurrentValue(price.toString())
     } catch(err) {
       console.error(err);
     }
@@ -27,7 +27,7 @@ function swapInfo() {
   }, [])
 
   return (
-    <div className='flex w-fit gap-3 p-4 items-center justify-between'>
+    <div className='flex w-full px-4 pt-2 items-center justify-end'>
 
           {/* modal */}
         { modalOpen === true && (
@@ -81,14 +81,14 @@ function swapInfo() {
 
 
 
-        <div className='card-inside p-3 w-fit'>
+        <div className='card-inside flex justify-center items-center h-10 p-3 mr-4 w-fit text-xs'>
             <p>1 SOL = {currentValue} USDC</p>
             
         </div>
 
         <div>
             <button 
-            className='button-base p-3'
+            className='flex justify-center items-center h-10 button-base text-xs p-3'
             onClick={()=> setModalOpen(true)}>
                 {currentSlippage}%
             </button>

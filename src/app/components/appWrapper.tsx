@@ -15,12 +15,12 @@ export default function AppWrapper({ children }: Props) {
      <div className='flex flex-col h-full'>
         <NetworkProvider>
       <nav className="flex items-center justify-end px-3 h-16 shrink-0">
-            <NetworkSelector />
-            <Providers>
-              <WalletMultiButton />
-            </Providers>
+        <NetworkSelector />
+        <Providers>
+          <WalletMultiButton />
+        </Providers>
       </nav>
-      <main className='flex-1 bg-pink-500'>
+      <main className='flex-1'>
         <Providers>
     {children}
         </Providers>

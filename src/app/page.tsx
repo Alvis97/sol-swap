@@ -4,7 +4,7 @@ import TransactionCard from "./components/transactionCard";
 
 export default function Home() {
   return (
-      <main className="flex w-full h-full justify-center items-center bg-sky-500">
+      <main className="flex w-full h-full justify-center items-center">
         <TransactionCard/>  
       </main>
   );
