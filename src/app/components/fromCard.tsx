@@ -16,12 +16,11 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     const [dropDownOpen, setDropDownOpen] = useState(false);
     const [balance, setBalance] = useState<number | null>(null);
     const [activeMaxButton, setActiveMaxButton] = useState(false);
+    const [insufficientFounds, setInsufficientFunds] = useState(false)
     const { publicKey } = useWallet();
     const { connection } = useConnection()
 
     useEffect(() => {
-
-          console.log("publicKey i useEffect:", publicKey?.toString())
  
         if (!publicKey) return;
          
@@ -49,7 +48,12 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
         <div className='flex justify-between items-start text-xs'>
             <p>From</p>
             <div className='flex items-start'>
-                <p>Balance: {balance}{currency}</p>
+                { !publicKey ? (
+                    <p className='text-rose-800'>Not Connected</p>
+                ) 
+                : (
+                    <p>Balance: {balance !== null ? balance.toFixed(2): "0.00"} {currency}</p>
+                )}
                 <button 
                 onClick={()=> {
                     if (balance !== null) {
@@ -87,9 +91,18 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
             type="text"
             inputMode='decimal'
             placeholder='o,00'
-            onChange={(e) => {setAmount(e.target.value); setActiveMaxButton(false)}}
+            onChange={(e) => {
+                const value = e.target.value;
+                setAmount(value);
+                setActiveMaxButton(false)
+                setInsufficientFunds(balance !== null && parseFloat(value) > balance)
+            
+            }}
              />
         </div>
+        {insufficientFounds && (
+    <p className="text-red-500 text-xs">Insufficient funds</p>
+)}
     </div>
   )
 }
