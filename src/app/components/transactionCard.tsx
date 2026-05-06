@@ -83,6 +83,12 @@ function TransactionCard() {
         fetchPrices()
     }, [])
 
+
+    function SwitchCards() {
+        setFromCurrency(toCurrency)
+        setFromAmount(toAmount)
+    }
+
   return (
     <div className='flex flex-col w-fit items-center'>
 
@@ -100,7 +106,11 @@ function TransactionCard() {
 
         <div className='relative flex flex-col justify-center items-center w-full py-5'>
             <hr  className='w-[80%] text-stone-300'/>
-            <button className='absolute button-submit p-3'><ArrowUpDown size={18}/></button>
+            <button 
+                className='absolute button-submit p-3'
+                onClick={SwitchCards}>
+                <ArrowUpDown size={18}/>
+            </button>
         </div>
         
        <ToCard
