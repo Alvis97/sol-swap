@@ -4,11 +4,14 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import React, { useEffect, useState } from 'react'
 import { getSolPrices } from '../../../lib/prices';
 
+type SwapInfoProps = {
+    slippage: string
+    setSlippage: (slippage: string) => void
+}
 
-function swapInfo() {
+function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
   const [ modalOpen, setModalOpen ] = useState(false);
   const [ currentValue, setCurrentValue ] = useState("");
-  const [ currentSlippage, setCurrentSlippage ] = useState("0,5");
 
     useEffect(() => {
     async function fetchPrice() {
@@ -45,18 +48,18 @@ function swapInfo() {
                 <p>Select your slippage</p>
                 <div className='flex my-5 w-45 justify-between'>
      <button 
-                onClick={()=> setCurrentSlippage("0.1")}
-                className={`${currentSlippage === "0.1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
+                onClick={()=> setSlippage("0.1")}
+                className={`${slippage === "0.1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
                     0,1
                 </button>
                 <button 
-                    onClick={() => setCurrentSlippage("0.5")}
-                    className={`${currentSlippage === "0.5" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
+                    onClick={() => setSlippage("0.5")}
+                    className={`${slippage === "0.5" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
                     0,5
                 </button>
                 <button 
-                    onClick={() => setCurrentSlippage("1")}
-                    className={ `${currentSlippage === "1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
+                    onClick={() => setSlippage("1")}
+                    className={ `${slippage === "1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
                     1
                     </button>
                 </div>
@@ -68,7 +71,7 @@ function swapInfo() {
                 min="0.1"
                 max="100"
                 step="0.1"
-                onBlur={(e) => setCurrentSlippage(e.target.value)}
+                onBlur={(e) => setSlippage(e.target.value)}
                 />
 
                 <button className='button-submit bg-[var(--hoverColor)] p-3 mt-5' onClick={()=> setModalOpen(false)}>Submit</button>
@@ -90,7 +93,7 @@ function swapInfo() {
             <button 
             className='flex justify-center items-center h-10 button-base text-xs p-3'
             onClick={()=> setModalOpen(true)}>
-                {currentSlippage}%
+                {slippage}%
             </button>
         </div>
 

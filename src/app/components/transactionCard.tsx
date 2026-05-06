@@ -10,13 +10,66 @@ import { getSolPrices } from '../../../lib/prices';
 import InfoCard from './infoCard';
 import SwapInfo from './swapInfo';
 import { ArrowUpDown } from 'lucide-react';
+import { getQuote, SOL_MINT, USDC_MINT } from '../../../lib/jupiter'
+import { useNetwork } from './networkContext';
 
 function TransactionCard() {
     const [fromCurrency, setFromCurrency] = useState("USDC")
-    const [fromAmount, setFromAmount] = useState("");
-    const [toAmount, setToAmount] = useState("");
+    const [fromAmount, setFromAmount] = useState("")
+    const [toAmount, setToAmount] = useState("")
     const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
     const [solPrice, setSolPrice] = useState<number | null>(null)
+    const [slippage, setSlippage] = useState("0.5")
+    const [transactionFee, setTransactionFee] = useState("")
+    const [minimumReceived, setMinimumReceived] = useState("")
+    const { selectedNetwork } = useNetwork()
+
+    useEffect(() => {
+        if (!fromAmount || !slippage) return
+
+        async function fetchQuote() {
+            if (selectedNetwork === "Devnet") {
+
+                if (!solPrice) return
+
+                try{
+                    const result = fromCurrency === "USDC" 
+                    ? parseFloat(fromAmount) / solPrice 
+                    : parseFloat(fromAmount) * solPrice
+
+                    setToAmount(result.toString())
+
+                    const slippageNum = parseFloat(slippage)
+                    const minReceived = result * (1 - slippageNum / 100)
+                    setMinimumReceived(minReceived.toFixed(6))
+
+                    setTransactionFee("0.000005")
+
+                } catch(err) {
+                    console.error(err)
+                }
+
+            } else {
+
+                try{
+                    const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT
+                    const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
+                    const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
+
+                    const quote = await getQuote(inputMint, outputMint, amount, slippage)
+                    setToAmount((quote.outAmount / 1e9).toString())
+                    setMinimumReceived((quote.otherAmountThreshold / 1e9).toString())
+                    setTransactionFee("0.000005")
+                    console.log("quote:", quote)
+
+                } catch(err) {
+                    console.error(err)
+                }
+            }
+        } 
+      fetchQuote()
+    }, [fromAmount, fromCurrency, slippage, solPrice])
+
 
     useEffect(() => {
         async function fetchPrices() {
@@ -30,26 +83,13 @@ function TransactionCard() {
         fetchPrices()
     }, [])
 
-
-    useEffect(() => {
-        console.log("fromAmount:", fromAmount)
-        console.log("solPrice:", solPrice)
-
-        if(!fromAmount || !solPrice) return
-
-        if(fromCurrency === "USDC") {
-            const result = ((parseFloat(fromAmount) / solPrice).toString())
-            console.log("toAmont:", result)
-            setToAmount(result);
-        } else {
-            setToAmount((parseFloat(fromAmount) * solPrice).toString())
-        }
-    }, [fromAmount, fromCurrency, solPrice])
-
   return (
     <div className='flex flex-col w-fit items-center'>
 
-        <SwapInfo/>
+        <SwapInfo
+          slippage={slippage}
+          setSlippage={setSlippage}
+        />
 
        <FromCard
        amount={fromAmount}
@@ -68,7 +108,11 @@ function TransactionCard() {
        toAmount={toAmount}
        currency={toCurrency}/>
 
-       <InfoCard/>
+       <InfoCard 
+        transactionFee={transactionFee.toString()}
+        slippage={slippage.toString()}
+        minimumReceived={minimumReceived}    
+        />
 
        <button className='button-submit p-3 m-3 w-80'>Swap Token</button>
     </div>
