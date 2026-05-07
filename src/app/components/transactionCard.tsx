@@ -24,6 +24,7 @@ function TransactionCard() {
     const [slippage, setSlippage] = useState("0.5")
     const [transactionFee, setTransactionFee] = useState("")
     const [minimumReceived, setMinimumReceived] = useState("")
+    const [ isLoading, setIsLoading ] = useState(false)
     const { selectedNetwork } = useNetwork()
     const { publicKey, signTransaction } = useWallet()
     const { connection } = useConnection()
@@ -96,6 +97,8 @@ function TransactionCard() {
     async function ExecudeSwap() {
         if(!publicKey || !signTransaction) return
         if(!fromAmount || !slippage ) return
+
+        setIsLoading(true)
 
         try {
             const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
@@ -176,9 +179,9 @@ function TransactionCard() {
        <button 
        className='button-submit p-3 m-3 w-80'
        onClick={ExecudeSwap}
-       disabled={!publicKey || !fromAmount}
+       disabled={!publicKey || !fromAmount || isLoading}
        >
-        Swap Token
+        {isLoading ? "Swapping..." : "Swap Token "}
         </button>
     </div>
   )
