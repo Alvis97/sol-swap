@@ -14,6 +14,7 @@ import { getQuote, SOL_MINT, USDC_MINT } from '../../../lib/jupiter'
 import { useNetwork } from './networkContext';
 import { PublicKey } from '@solana/web3.js';
 import { VersionedTransaction } from '@solana/web3.js'
+import ResultModal from './resultModal';
 
 function TransactionCard() {
     const [fromCurrency, setFromCurrency] = useState("USDC")
@@ -25,6 +26,10 @@ function TransactionCard() {
     const [transactionFee, setTransactionFee] = useState("")
     const [minimumReceived, setMinimumReceived] = useState("")
     const [ isLoading, setIsLoading ] = useState(false)
+    const [modalOpen, setModalOpen] = useState(false)
+    const [swapSuccess, setSwapSuccess] = useState(false)
+    const [txid, setTxid] = useState("")
+    const [swapError, setSwapError] = useState("")
     const { selectedNetwork } = useNetwork()
     const { publicKey, signTransaction } = useWallet()
     const { connection } = useConnection()
@@ -135,9 +140,15 @@ function TransactionCard() {
         // confirm
         await connection.confirmTransaction(txid, "confirmed")
         console.log("Successfull Swap", txid)
+        setTxid(txid)
+        setSwapSuccess(true)
+        setModalOpen(true)
 
         } catch(err) {
             console.error("Swap failed:", err)
+            setSwapError(err instanceof Error ? err.message : "Something went wrong")
+            setSwapSuccess(false)
+            setModalOpen(true)
         }
     }
 
@@ -183,6 +194,22 @@ function TransactionCard() {
        >
         {isLoading ? "Swapping..." : "Swap Token "}
         </button>
+
+
+        { modalOpen && (
+            <ResultModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                success={swapSuccess}
+                txid={txid}
+                fromAmount={fromAmount}
+                fromCurrency={fromCurrency}
+                toAmount={toAmount}
+                toCurrency={toCurrency}
+                error={swapError}
+            />
+        )}
+
     </div>
   )
 }
