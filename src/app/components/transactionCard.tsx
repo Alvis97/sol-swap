@@ -12,6 +12,8 @@ import SwapInfo from './swapInfo';
 import { ArrowUpDown } from 'lucide-react';
 import { getQuote, SOL_MINT, USDC_MINT } from '../../../lib/jupiter'
 import { useNetwork } from './networkContext';
+import { PublicKey } from '@solana/web3.js';
+import { VersionedTransaction } from '@solana/web3.js'
 
 function TransactionCard() {
     const [fromCurrency, setFromCurrency] = useState("USDC")
@@ -23,6 +25,8 @@ function TransactionCard() {
     const [transactionFee, setTransactionFee] = useState("")
     const [minimumReceived, setMinimumReceived] = useState("")
     const { selectedNetwork } = useNetwork()
+    const { publicKey, signTransaction } = useWallet()
+    const { connection } = useConnection()
 
     useEffect(() => {
         if (!fromAmount || !slippage) return
@@ -89,6 +93,51 @@ function TransactionCard() {
         setFromAmount(toAmount)
     }
 
+    async function ExecudeSwap() {
+        if(!publicKey || !signTransaction) return
+        if(!fromAmount || !slippage ) return
+
+        try {
+            const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
+            const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
+            const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
+
+            //get quote
+            const quote = await getQuote(inputMint, outputMint, amount, slippage)
+
+            //get swaptransaction from jupiter
+            const swapRes = await fetch("https://quote-api.jup.ag/v6/swap", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    quoteResponse: quote,
+                    userPublickey: publicKey.toString(),
+                    wrapAndUnwrapSol: true,
+                })
+              
+            })
+
+        const { swapTransaction } = await swapRes.json()
+
+        //Sign
+        const transaction = VersionedTransaction.deserialize(
+            Buffer.from(swapTransaction, "base64")
+        )
+
+        const signedTx = await signTransaction(transaction)
+
+        //send transaction
+        const txid = await connection.sendRawTransaction(signedTx.serialize())
+
+        // confirm
+        await connection.confirmTransaction(txid, "confirmed")
+        console.log("Successfull Swap", txid)
+
+        } catch(err) {
+            console.error("Swap failed:", err)
+        }
+    }
+
   return (
     <div className='flex flex-col w-fit items-center'>
 
@@ -124,7 +173,13 @@ function TransactionCard() {
         minimumReceived={minimumReceived}    
         />
 
-       <button className='button-submit p-3 m-3 w-80'>Swap Token</button>
+       <button 
+       className='button-submit p-3 m-3 w-80'
+       onClick={ExecudeSwap}
+       disabled={!publicKey || !fromAmount}
+       >
+        Swap Token
+        </button>
     </div>
   )
 }
