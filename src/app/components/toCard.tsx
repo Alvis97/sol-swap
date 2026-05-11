@@ -46,10 +46,10 @@ function ToCard({fromAmount, currency, toAmount}: ToCardProps) {
     }, [publicKey, connection, currency])
 
   return (
-        <div className='card-base flex flex-col justify-between w-80 h-30 m-4 p-3'>
+        <div className='card-base flex flex-col justify-between w-85 h-25 m-4 p-3'>
         {/* top part */}
         <div className='flex justify-between items-center text-xs'>
-            <p>To</p>
+            <p className='font-extrabold'>To</p>
             <div className='flex items-center'>
                 <p>Balance: {balance !== null ? balance.toFixed(2): "0.00"} {currency}</p>
             </div>

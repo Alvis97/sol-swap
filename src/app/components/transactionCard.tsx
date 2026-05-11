@@ -153,7 +153,7 @@ function TransactionCard() {
     }
 
   return (
-    <div className='flex flex-col w-fit items-center'>
+    <div className='flex flex-col w-fit h-full items-center justify-center'>
 
         <SwapInfo
           slippage={slippage}

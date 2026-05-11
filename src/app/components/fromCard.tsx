@@ -43,10 +43,10 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     }, [publicKey, connection, currency])
 
   return (
-    <div className='card-base flex flex-col justify-between w-80 h-30 m-4 p-3'>
+    <div className='card-base flex flex-col justify-between w-85 h-28 m-4 p-3'>
         {/* top part */}
         <div className='flex justify-between items-start text-xs'>
-            <p>From</p>
+            <p className='font-extrabold'>From</p>
             <div className='flex items-start'>
                 { !publicKey ? (
                     <p className='text-rose-800'>Not Connected</p>

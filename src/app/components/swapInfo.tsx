@@ -30,7 +30,7 @@ function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
   }, [])
 
   return (
-    <div className='flex w-full px-4 pt-2 items-center justify-end'>
+    <div className='flex w-full px-4 pt-2 mb-2 items-center justify-end'>
 
           {/* modal */}
         { modalOpen === true && (
@@ -38,14 +38,14 @@ function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
         onClick={()=> setModalOpen(false)} 
         className='fixed flex inset-0 z-50 bg-black/50 justify-center items-center'>
             <div 
-            className='flex flex-col w-md p-5 items-end rounded-sm bg-[var(--background)]'
+            className='flex flex-col w-xs p-5 text-sm items-end rounded-sm bg-[var(--background)]'
             onClick={(e) => e.stopPropagation()}>
                 <button
                 onClick={()=> setModalOpen(false)}>
                     x
                 </button>
                 <div className='flex flex-col w-full items-start'>
-                <p>Select your slippage</p>
+                <p>Select your slippage:</p>
                 <div className='flex my-5 w-45 justify-between'>
      <button 
                 onClick={()=> setSlippage("0.1")}
@@ -74,7 +74,7 @@ function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
                 onBlur={(e) => setSlippage(e.target.value)}
                 />
 
-                <button className='button-submit bg-[var(--hoverColor)] p-3 mt-5' onClick={()=> setModalOpen(false)}>Submit</button>
+                <button className='button-submit bg-[var(--hoverColor)] text-xs py-3 px-4 mt-5' onClick={()=> setModalOpen(false)}>Select</button>
 
                 </div>
          </div>
@@ -84,14 +84,14 @@ function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
 
 
 
-        <div className='card-inside flex justify-center items-center h-10 p-3 mr-4 w-fit text-xs'>
+        <div className='card-inside flex justify-center items-center  p-3 mr-4 w-fit text-xs'>
             <p>1 SOL = {currentValue} USDC</p>
             
         </div>
 
         <div>
             <button 
-            className='flex justify-center items-center h-10 button-base text-xs p-3'
+            className='flex justify-center items-center button-base text-xs p-3'
             onClick={()=> setModalOpen(true)}>
                 {slippage}%
             </button>
