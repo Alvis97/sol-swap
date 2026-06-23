@@ -22,3 +22,4 @@ export async function getUsdBalance(publicKey: PublicKey, connection: Connection
   const balance = await connection.getBalance(publicKey);
   return balance / 1e9 //lamports to SOL
 }
+ 
