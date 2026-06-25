@@ -11,9 +11,7 @@ export async function GET() {
     }
     )
     const data = await response.json()
-    console.log(JSON.stringify(data, null, 2));
     const solPrice = data["So11111111111111111111111111111111111111112"]?.usdPrice
-     console.log("SOL PRICE:", solPrice) // 
   return NextResponse.json({solana: { usd: solPrice } })
 }
 

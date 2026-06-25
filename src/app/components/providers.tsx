@@ -16,14 +16,22 @@ export default function Providers({ children } : { children: ReactNode; }) {
   const { selectedNetwork } = useNetwork();
 
     const network = 
-    selectedNetwork === "Devnet" 
+    selectedNetwork === "devnet" 
     ? WalletAdapterNetwork.Devnet
     :  WalletAdapterNetwork.Mainnet
-    const endpoint = useMemo(() => clusterApiUrl(network), [network])
+
+    const endpoint = useMemo(() => 
+      selectedNetwork === "devnet" 
+    ? (process.env.NEXT_PUBLIC_HELIUS_DEVNET_RPC_URL ?? "https://api.devnet.solana.com")
+    : (process.env.NEXT_PUBLIC_HELIUS_RPC_URL ?? "https://api.mainnet-beta.solana.com"),
+    [selectedNetwork]
+)
+
     const wallets = useMemo(() => [new PhantomWalletAdapter()], [network])
 
     console.log("network:",network)
     console.log("selected Network:", selectedNetwork)
+    console.log("endpoint:", endpoint);
 
   return (
       <ConnectionProvider endpoint={endpoint}>

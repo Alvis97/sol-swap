@@ -10,7 +10,7 @@ type NetworkContextType = {
 const NetworkContext = createContext<NetworkContextType | undefined>(undefined)
 
 export function NetworkProvider({children}: { children: React.ReactNode}) {
-    const [selectedNetwork, setSelectedNetwork] = useState("Devnet")
+    const [selectedNetwork, setSelectedNetwork] = useState("devnet")
   return (
     <NetworkContext.Provider value={{ selectedNetwork, setSelectedNetwork}}>
         {children}

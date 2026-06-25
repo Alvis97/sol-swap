@@ -4,6 +4,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import React, { useEffect, useState } from 'react'
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
 import { getSolPrices } from '../../../lib/prices';
+import { useNetwork } from './networkContext';
 
 type ToCardProps = {
     currency: string
@@ -17,6 +18,7 @@ function ToCard({fromAmount, currency, toAmount}: ToCardProps) {
     const [convertedBalance, setConvertedBalance] = useState<number | null>(null)
     const { publicKey } = useWallet();
     const { connection } = useConnection()
+    const { selectedNetwork } = useNetwork();
     
     useEffect(() => {
         if (!publicKey) return;

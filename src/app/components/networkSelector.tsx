@@ -26,10 +26,10 @@ function NetworkSelector() {
             className='button-base w-fill flex text-xs items-center p-2.5 rounded-md'
             onClick={()=> {
                 setSelectedNetwork(
-                    selectedNetwork === "Mainnet" ? "Devnet" : "Mainnet")  
+                    selectedNetwork === "mainnet-beta" ? "devnet" : "mainnet-beta")  
                 setOpen(false)
             }}>
-            {selectedNetwork === "Mainnet" ? "Devnet" : "Mainnet"}
+            {selectedNetwork === "mainnet-beta" ? "devnet" : "mainnet-beta"}
         </button>
     </div>
     )}
