@@ -15,6 +15,7 @@ export async function getQuote(
     )
 
     const data = await response.json()
+    console.log("getQuote",data);
     return data
 
 

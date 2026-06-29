@@ -17,7 +17,7 @@ export async function getUsdBalance(
 ): Promise<number> {
 
   try{
-    const isDevnet = connection.rpcEndpoint.includes("devnet")
+    const isDevnet = connection.rpcEndpoint.includes("Devnet")
     const USDC_MINT = isDevnet ? USDC_MINT_DEVNET : USDC_MINT_MAINNET
     const tokenAdress = await getAssociatedTokenAddress(USDC_MINT, publicKey)
     const account = await getAccount(connection, tokenAdress)

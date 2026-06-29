@@ -38,7 +38,7 @@ function TransactionCard() {
         if (!fromAmount || !slippage) return
 
         async function fetchQuote() {
-            if (selectedNetwork === "devnet") {
+            if (selectedNetwork === "Devnet") {
 
                 if (!solPrice) return
 
