@@ -18,7 +18,7 @@ const WalletAdapter: React.FC<SolanaWalletProps> = ({children}) => {
 
     const { selectedNetwork } = useNetwork()
 
-    const network = selectedNetwork === "mainnet-beta"
+    const network = selectedNetwork === "Mainnet"
     ? WalletAdapterNetwork.Mainnet
     : WalletAdapterNetwork.Devnet;
 

@@ -8,7 +8,7 @@ import { useNetwork } from '@/app/components/networkContext';
 const USDC_MINT_DEVNET = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU')
 const USDC_MINT_MAINNET = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 
-type Network = "devnet" | "mainnet-beta"
+type Network = "Devnet" | "Mainnet"
 
 
 export async function getUsdBalance(
