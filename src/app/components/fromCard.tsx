@@ -10,9 +10,6 @@ type FromCardProps = {
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import React, { useEffect, useState } from 'react'
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
-import { Network } from 'inspector/promises'
-import { useNetwork } from './networkContext'
 
 function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     const [dropDownOpen, setDropDownOpen] = useState(false);
@@ -21,8 +18,6 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     const [insufficientFounds, setInsufficientFunds] = useState(false)
     const { publicKey } = useWallet();
     const { connection } = useConnection();
-    const { selectedNetwork } = useNetwork();
-
 
     useEffect(() => {
  
@@ -33,6 +28,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
             if (currency === "USDC") {
                const usdcBal = await getUsdBalance(publicKey!,connection)
                console.log("usdcBal:", usdcBal)
+               console.log("connection endpoint:", connection.rpcEndpoint)
                setBalance(usdcBal)
             } else if (currency === "SOL") {
                 const bal= await getSolBalance(publicKey!, connection);
@@ -44,7 +40,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
         }
     }
     fetchBalance()
-    }, [publicKey, connection, selectedNetwork, currency])
+    }, [publicKey, connection, currency])
 
   return (
     <div className='card-base flex flex-col justify-between w-85 h-28 m-4 p-3'>

@@ -4,27 +4,27 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import React, { useEffect, useState } from 'react'
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
 import { getSolPrices } from '../../../lib/prices';
-import { useNetwork } from './networkContext';
+import { stringify } from 'querystring';
 
 type ToCardProps = {
-    currency: string
     fromAmount: string
     toAmount: string
+    currency: string
 }
 
 function ToCard({fromAmount, currency, toAmount}: ToCardProps) {
-    const [dropDownOpen, setDropDownOpen] = useState(false);
     const [balance, setBalance] = useState<number | null>(null);
     const [convertedBalance, setConvertedBalance] = useState<number | null>(null)
     const { publicKey } = useWallet();
     const { connection } = useConnection()
-    const { selectedNetwork } = useNetwork();
     
     useEffect(() => {
         if (!publicKey) return;
+
+        console.log(toAmount);
             
         async function fetchBalance() {
-        try{
+            try{
             if (currency === "USDC"){
                 const usdcBal = await getUsdBalance(publicKey!, connection)
                 const solPrice = await getSolPrices()
@@ -40,11 +40,12 @@ function ToCard({fromAmount, currency, toAmount}: ToCardProps) {
                 setConvertedBalance(convertedBal)
             }
 
-        } catch(err) {
-            console.error(err);
+            } catch(err) {
+                console.error(err);
+            }
         }
-    }
-    fetchBalance()
+        fetchBalance()
+
     }, [publicKey, connection, currency])
 
   return (

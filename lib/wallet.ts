@@ -1,14 +1,9 @@
 import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import React from 'react'
-import { USDC_MINT } from './jupiter';
-import { useNetwork } from '@/app/components/networkContext';
 
 // USDC token mint address on Devnet
-const USDC_MINT_DEVNET = new PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU')
 const USDC_MINT_MAINNET = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
-
-type Network = "Devnet" | "Mainnet"
 
 
 export async function getUsdBalance(
@@ -17,11 +12,10 @@ export async function getUsdBalance(
 ): Promise<number> {
 
   try{
-    const isDevnet = connection.rpcEndpoint.includes("Devnet")
-    const USDC_MINT = isDevnet ? USDC_MINT_DEVNET : USDC_MINT_MAINNET
+    const USDC_MINT = USDC_MINT_MAINNET
     const tokenAdress = await getAssociatedTokenAddress(USDC_MINT, publicKey)
     const account = await getAccount(connection, tokenAdress)
-    console.log("USDC_MINT", USDC_MINT.toString());
+    console.log("USDC_MINT wallet.ts", USDC_MINT.toString());
     return Number(account.amount) / 1e6 // Usdc, 6 decimals
   } catch (err) {
     return 0 //If user has 0 dollars

@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Unbounded } from "next/font/google";
 import "./globals.css";
 import { ReactNode} from "react";
-import Navigation from "./components/networkSelector";
 import Providers from "./components/providers";
-import NetworkSelector from "./components/networkSelector";
 import AppWrapper from "./components/appWrapper";
 
 const unbounded = Unbounded ({

@@ -11,7 +11,6 @@ import InfoCard from './infoCard';
 import SwapInfo from './swapInfo';
 import { ArrowUpDown } from 'lucide-react';
 import { getQuote, SOL_MINT, USDC_MINT } from '../../../lib/jupiter'
-import { useNetwork } from './networkContext';
 import { PublicKey } from '@solana/web3.js';
 import { VersionedTransaction } from '@solana/web3.js'
 import ResultModal from './resultModal';
@@ -19,7 +18,9 @@ import ResultModal from './resultModal';
 function TransactionCard() {
     const [fromCurrency, setFromCurrency] = useState("USDC")
     const [fromAmount, setFromAmount] = useState("")
+
     const [toAmount, setToAmount] = useState("")
+
     const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
     const [solPrice, setSolPrice] = useState<number | null>(null)
     const [slippage, setSlippage] = useState("0.5")
@@ -30,7 +31,6 @@ function TransactionCard() {
     const [swapSuccess, setSwapSuccess] = useState(false)
     const [txid, setTxid] = useState("")
     const [swapError, setSwapError] = useState("")
-    const { selectedNetwork } = useNetwork()
     const { publicKey, signTransaction } = useWallet()
     const { connection } = useConnection()
 
@@ -38,118 +38,105 @@ function TransactionCard() {
         if (!fromAmount || !slippage) return
 
         async function fetchQuote() {
-            if (selectedNetwork === "Devnet") {
 
-                if (!solPrice) return
-
-                try{
-                    const result = fromCurrency === "USDC" 
-                    ? parseFloat(fromAmount) / solPrice 
-                    : parseFloat(fromAmount) * solPrice
-
-                    setToAmount(result.toString())
-
-                    const slippageNum = parseFloat(slippage)
-                    const minReceived = result * (1 - slippageNum / 100)
-                    setMinimumReceived(minReceived.toFixed(6))
-
-                    setTransactionFee("0.000005")
-
-                } catch(err) {
-                    console.error(err)
-                }
-
-            } else {
-
-                try{
-                    const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT
-                    const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
-                    const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
-
-                    const quote = await getQuote(inputMint, outputMint, amount, slippage)
-                    setToAmount((quote.outAmount / 1e9).toString())
-                    setMinimumReceived((quote.otherAmountThreshold / 1e9).toString())
-                    setTransactionFee("0.000005")
-                    console.log("quote:", quote)
-
-                } catch(err) {
-                    console.error(err)
-                }
-            }
-        } 
-      fetchQuote()
-    }, [fromAmount, fromCurrency, slippage, solPrice])
-
-
-    useEffect(() => {
-        async function fetchPrices() {
             try{
-                const price = await getSolPrices()
-                setSolPrice(price)
+                //checking what currency
+                const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT
+                const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
+                const inputDecimals = fromCurrency === "USDC" ? 1e6 : 1e9
+                const outputDecimals = fromCurrency === "USDC" ? 1e6 : 1e9
+
+                const amount = Math.floor(parseFloat(fromAmount) * inputDecimals)
+
+                const quote = await getQuote(inputMint, outputMint, amount, slippage)
+                console.log("FULL QUOTE:", quote)
+
+
+                //Caluculate new amount
+                if (fromCurrency === "USDC") {
+                    setToAmount((quote.outAmount / 1e9).toString())
+                } else {
+                    setToAmount((quote.outAmount / 1e6).toString())
+                }
+
+                setMinimumReceived((quote.otherAmountThreshold / 1e9).toString())
+                setTransactionFee("0.000005")
+                console.log("quote:", quote)
+
             } catch(err) {
                 console.error(err)
             }
+        } 
+        fetchQuote()
+        }, [fromAmount, fromCurrency, slippage, solPrice])
+
+
+
+            async function fetchPrices() {
+                try{
+                    const price = await getSolPrices()
+                    setSolPrice(price)
+                } catch(err) {
+                    console.error(err)
+                }
+            }
+            fetchPrices()
+
+
+        function SwitchCards() {
+            setFromCurrency(toCurrency)
+            setFromAmount(toAmount)
         }
-        fetchPrices()
-    }, [])
-
-
-    function SwitchCards() {
-        setFromCurrency(toCurrency)
-        setFromAmount(toAmount)
-    }
 
     async function ExecudeSwap() {
         if(!publicKey || !signTransaction) return
         if(!fromAmount || !slippage ) return
 
-        setIsLoading(true)
+            setIsLoading(true)
+            try {
+                const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
+                const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
+                const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
 
-        try {
-            const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
-            const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
-            const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
+                //get quote
+                const quote = await getQuote(inputMint, outputMint, amount, slippage)
 
-            //get quote
-            const quote = await getQuote(inputMint, outputMint, amount, slippage)
+                //get swaptransaction from jupiter
+                const swapRes = await fetch("https://quote-api.jup.ag/v6/swap", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        quoteResponse: quote,
+                        userPublickey: publicKey.toString(),
+                        wrapAndUnwrapSol: true,
+                        })
+                    })
 
-            //get swaptransaction from jupiter
-            const swapRes = await fetch("https://quote-api.jup.ag/v6/swap", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    quoteResponse: quote,
-                    userPublickey: publicKey.toString(),
-                    wrapAndUnwrapSol: true,
-                })
-              
-            })
+                const { swapTransaction } = await swapRes.json()
 
-        const { swapTransaction } = await swapRes.json()
+                //Sign
+                const transaction = VersionedTransaction.deserialize(
+                    Buffer.from(swapTransaction, "base64")
+                )
 
-        //Sign
-        const transaction = VersionedTransaction.deserialize(
-            Buffer.from(swapTransaction, "base64")
-        )
+                const signedTx = await signTransaction(transaction)
 
-        const signedTx = await signTransaction(transaction)
+                //send transaction
+                const txid = await connection.sendRawTransaction(signedTx.serialize())
 
-        //send transaction
-        const txid = await connection.sendRawTransaction(signedTx.serialize())
+                // confirm
+                await connection.confirmTransaction(txid, "confirmed")
+                console.log("Successfull Swap", txid)
+                setTxid(txid)
+                setSwapSuccess(true)
+                setModalOpen(true)
 
-        // confirm
-        await connection.confirmTransaction(txid, "confirmed")
-        console.log("Successfull Swap", txid)
-        setTxid(txid)
-        setSwapSuccess(true)
-        setModalOpen(true)
-
-        } catch(err) {
-            console.error("Swap failed:", err)
-            setSwapError(err instanceof Error ? err.message : "Something went wrong")
-            setSwapSuccess(false)
-            setModalOpen(true)
-        }
+            } catch(err) {
+                console.error("Swap failed:", err)
+                setSwapError(err instanceof Error ? err.message : "Something went wrong")
+                setSwapSuccess(false)
+                setModalOpen(true)
+            }
     }
 
   return (
