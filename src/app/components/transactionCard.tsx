@@ -35,7 +35,8 @@ function TransactionCard() {
     const { connection } = useConnection()
 
     useEffect(() => {
-        if (!fromAmount || !slippage) return
+        const fromAmountNum = parseFloat(fromAmount);
+        if (!fromAmount || !slippage || isNaN(fromAmountNum) || fromAmountNum >= 0) return
 
         async function fetchQuote() {
 
@@ -51,7 +52,6 @@ function TransactionCard() {
                 const quote = await getQuote(inputMint, outputMint, amount, slippage)
                 console.log("FULL QUOTE:", quote)
 
-
                 //Caluculate new amount
                 if (fromCurrency === "USDC") {
                     setToAmount((quote.outAmount / 1e9).toString())
@@ -60,6 +60,7 @@ function TransactionCard() {
                 }
 
                 setMinimumReceived((quote.otherAmountThreshold / 1e9).toString())
+                
                 setTransactionFee("0.000005")
                 console.log("quote:", quote)
 
@@ -71,73 +72,84 @@ function TransactionCard() {
         }, [fromAmount, fromCurrency, slippage, solPrice])
 
 
-
+        //Fetch SOL-prices
+        useEffect(() => {
             async function fetchPrices() {
-                try{
-                    const price = await getSolPrices()
-                    setSolPrice(price)
-                } catch(err) {
-                    console.error(err)
+                    try{
+                        const price = await getSolPrices()
+                        setSolPrice(price)
+                    } catch(err) {
+                        console.error(err)
+                    }
                 }
-            }
-            fetchPrices()
+                fetchPrices()
+        }, [])
 
 
+        //Switch cards
         function SwitchCards() {
             setFromCurrency(toCurrency)
             setFromAmount(toAmount)
         }
 
-    async function ExecudeSwap() {
-        if(!publicKey || !signTransaction) return
-        if(!fromAmount || !slippage ) return
 
-            setIsLoading(true)
-            try {
-                const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
-                const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
-                const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
+        //ExecudeSwap
+        async function ExecudeSwap() {
+            if(!publicKey || !signTransaction) return
+            if(!fromAmount || !slippage ) return
 
-                //get quote
-                const quote = await getQuote(inputMint, outputMint, amount, slippage)
+                setIsLoading(true)
+                try {
+                    const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
+                    const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
+                    const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
 
-                //get swaptransaction from jupiter
-                const swapRes = await fetch("https://quote-api.jup.ag/v6/swap", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        quoteResponse: quote,
-                        userPublickey: publicKey.toString(),
-                        wrapAndUnwrapSol: true,
+                    //get quote step 1
+                    const quote = await getQuote(inputMint, outputMint, amount, slippage)
+                    console.log("Step one done", quote);
+
+                    //get swaptransaction from jupiter step 2
+                    const swapRes = await fetch("https://quote-api.jup.ag/v6/swap", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            quoteResponse: quote,
+                            userPublickey: publicKey.toString(),
+                            wrapAndUnwrapSol: true,
+                            })
                         })
-                    })
 
-                const { swapTransaction } = await swapRes.json()
+                    const { swapTransaction } = await swapRes.json()
+                    console.log("step 2 done", swapRes);
 
-                //Sign
-                const transaction = VersionedTransaction.deserialize(
-                    Buffer.from(swapTransaction, "base64")
-                )
+                    //Convert transaction step 3
+                    const transaction = VersionedTransaction.deserialize(
+                        Buffer.from(swapTransaction, "base64")
+                    )
+                    console.log("Step 3 done", transaction)
 
-                const signedTx = await signTransaction(transaction)
+                    //Sign Transaction step 4
+                    const signedTx = await signTransaction(transaction)
+                    console.log("Step 4 done", signedTx);
 
-                //send transaction
-                const txid = await connection.sendRawTransaction(signedTx.serialize())
+                    //send transaction step 5
+                    const txid = await connection.sendRawTransaction(signedTx.serialize())
+                    console.log("step 5 done", txid);
 
-                // confirm
-                await connection.confirmTransaction(txid, "confirmed")
-                console.log("Successfull Swap", txid)
-                setTxid(txid)
-                setSwapSuccess(true)
-                setModalOpen(true)
+                    // confirm transaction step 6
+                    await connection.confirmTransaction(txid, "confirmed")
+                    console.log("Successfull Swap step 6", txid)
+                    setTxid(txid)
+                    setSwapSuccess(true)
+                    setModalOpen(true)
 
-            } catch(err) {
-                console.error("Swap failed:", err)
-                setSwapError(err instanceof Error ? err.message : "Something went wrong")
-                setSwapSuccess(false)
-                setModalOpen(true)
-            }
-    }
+                } catch(err) {
+                    console.error("Swap failed:", err)
+                    setSwapError(err instanceof Error ? err.message : "Something went wrong")
+                    setSwapSuccess(false)
+                    setModalOpen(true)
+                }
+        }
 
   return (
     <div className='flex flex-col w-fit h-full items-center justify-center'>

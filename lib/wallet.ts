@@ -2,7 +2,7 @@ import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import React from 'react'
 
-// USDC token mint address on Devnet
+// USDC token mint address on Mainnet
 const USDC_MINT_MAINNET = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 
 
@@ -30,7 +30,7 @@ export async function getSolBalance(
 
     try { 
       const balance = await connection.getBalance(publicKey);
-      return balance / 1e6
+      return balance / 1e9
     } catch {
       return 0
     }

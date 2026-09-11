@@ -32,11 +32,12 @@ function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
   return (
     <div className='flex w-full px-4 pt-2 mb-2 items-center justify-end'>
 
-          {/* modal */}
-        { modalOpen === true && (
+    {/* modal */}
+    { modalOpen === true && (
         <div 
         onClick={()=> setModalOpen(false)} 
         className='fixed flex inset-0 z-50 bg-black/50 justify-center items-center'>
+            
             <div 
             className='flex flex-col w-xs p-5 text-sm items-end rounded-sm bg-[var(--background)]'
             onClick={(e) => e.stopPropagation()}>
@@ -47,10 +48,10 @@ function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
                 <div className='flex flex-col w-full items-start'>
                 <p>Select your slippage:</p>
                 <div className='flex my-5 w-45 justify-between'>
-     <button 
-                onClick={()=> setSlippage("0.1")}
-                className={`${slippage === "0.1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
-                    0,1
+                <button 
+                    onClick={()=> setSlippage("0.1")}
+                    className={`${slippage === "0.1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
+                        0,1
                 </button>
                 <button 
                     onClick={() => setSlippage("0.5")}

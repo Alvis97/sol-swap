@@ -12,8 +12,13 @@ export async function GET(request: Request) {
  const slippageBps = searchParams.get('slippageBps')
 
  const response = await fetch(
-      `https://api.jup.ag/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=${slippageBps}`
- )
+      `https://api.jup.ag/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=${slippageBps}`,
+ { headers: {
+   'x-api-key' : API_KEY!,
+ }
+
+ }
+    )
 
  if (!response.ok) {
    const errText = await response.text()

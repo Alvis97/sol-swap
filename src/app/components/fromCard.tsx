@@ -28,7 +28,6 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
             if (currency === "USDC") {
                const usdcBal = await getUsdBalance(publicKey!,connection)
                console.log("usdcBal:", usdcBal)
-               console.log("connection endpoint:", connection.rpcEndpoint)
                setBalance(usdcBal)
             } else if (currency === "SOL") {
                 const bal= await getSolBalance(publicKey!, connection);
