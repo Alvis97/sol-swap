@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import SwapCard from './fromCard'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { getSolBalance } from '../../../lib/wallet';
+import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
 import FromCard from './fromCard';
 import ToCard from './toCard';
 import { getSolPrices } from '../../../lib/prices';
@@ -16,27 +16,66 @@ import { VersionedTransaction } from '@solana/web3.js'
 import ResultModal from './resultModal';
 
 function TransactionCard() {
+    const { publicKey, signTransaction } = useWallet()
+    const { connection } = useConnection()
+
     const [fromCurrency, setFromCurrency] = useState("USDC")
-    const [fromAmount, setFromAmount] = useState("")
-
-    const [toAmount, setToAmount] = useState("")
-
     const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
-    const [solPrice, setSolPrice] = useState<number | null>(null)
+
+    const [fromAmount, setFromAmount] = useState<number | null>(null)
+    const [toAmount, setToAmount] = useState<number | null>(null)
+
+    const [balance, setBalance] = useState<number>();
+    const [usBalance, setUsBalance] = useState<number>();
+    const [newBalance, setNewBalance] = useState<number | null>(null);
+
+    const [solPrice, setSolPrice] = useState<number>()
     const [slippage, setSlippage] = useState("0.5")
     const [transactionFee, setTransactionFee] = useState("")
     const [minimumReceived, setMinimumReceived] = useState("")
+
     const [ isLoading, setIsLoading ] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
     const [swapSuccess, setSwapSuccess] = useState(false)
     const [txid, setTxid] = useState("")
     const [swapError, setSwapError] = useState("")
-    const { publicKey, signTransaction } = useWallet()
-    const { connection } = useConnection()
 
     useEffect(() => {
-        const fromAmountNum = parseFloat(fromAmount);
-        if (!fromAmount || !slippage || isNaN(fromAmountNum) || fromAmountNum >= 0) return
+        console.log("fromAmount transactioncard", fromAmount);
+
+        function convertedAmount() {
+        try{
+            if (fromCurrency === "USDC"){
+
+                if (usBalance !== undefined && solPrice !== solPrice){
+                    const convertedUsBal = usBalance! / solPrice! //USCD / price = SOL
+                    setNewBalance(convertedUsBal)
+                    console.log("ConvertedBalance from USDC transactionCard:", convertedUsBal)
+                }
+   
+            } else if (fromCurrency === "SOL") {
+
+                if (fromAmount !== null && solPrice !== undefined) {
+                    const convertedBal = fromAmount * solPrice // SOL * price = USDC 
+                    setNewBalance(convertedBal)
+                    console.log("ConvertedBalance to SOL", convertedBal)
+                }
+            }
+
+            } catch(err) {
+                console.error(err);
+            }
+        }
+        convertedAmount()
+    }, [fromAmount])
+
+
+    useEffect(() => {
+        const fromAmountNum = (fromAmount);
+ 
+    
+        if (!fromAmount || !slippage ) return
+    
 
         async function fetchQuote() {
 
@@ -47,22 +86,27 @@ function TransactionCard() {
                 const inputDecimals = fromCurrency === "USDC" ? 1e6 : 1e9
                 const outputDecimals = fromCurrency === "USDC" ? 1e6 : 1e9
 
-                const amount = Math.floor(parseFloat(fromAmount) * inputDecimals)
+                if (fromAmount !== null) {
+                    const amount = Math.floor(fromAmount * inputDecimals)
 
-                const quote = await getQuote(inputMint, outputMint, amount, slippage)
-                console.log("FULL QUOTE:", quote)
+                    const quote = await getQuote(inputMint, outputMint, amount, slippage)
+                    console.log("FULL QUOTE:", quote)
 
-                //Caluculate new amount
-                if (fromCurrency === "USDC") {
-                    setToAmount((quote.outAmount / 1e9).toString())
-                } else {
-                    setToAmount((quote.outAmount / 1e6).toString())
-                }
+                    //Caluculate new amount
+                    if (fromCurrency === "USDC") {
+                        setToAmount((quote.outAmount / 1e9)) //Finns inget som heter out amount
+                        console.log("toAmount:", toAmount);
+                    } else {
+                        setToAmount((quote.outAmount / 1e6))
+                        console.log("toAmount:", toAmount);
+                    }
 
-                setMinimumReceived((quote.otherAmountThreshold / 1e9).toString())
-                
-                setTransactionFee("0.000005")
-                console.log("quote:", quote)
+                    setMinimumReceived((quote.otherAmountThreshold / 1e9).toString())
+                    
+                    setTransactionFee("0.000005")
+                    console.log("quote:", quote)
+                } 
+    
 
             } catch(err) {
                 console.error(err)
@@ -83,7 +127,16 @@ function TransactionCard() {
                     }
                 }
                 fetchPrices()
-        }, [])
+        }, [publicKey, connection])
+
+        //get USDC balance 
+        useEffect(() => {
+            async function fetchBalance() {
+                const usdcBal = await getUsdBalance(publicKey!, connection)
+                setUsBalance(usdcBal);
+            }
+           fetchBalance()
+        }, [publicKey, connection])
 
 
         //Switch cards
@@ -102,7 +155,7 @@ function TransactionCard() {
                 try {
                     const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
                     const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
-                    const amount = parseFloat(fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
+                    const amount = (fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
 
                     //get quote step 1
                     const quote = await getQuote(inputMint, outputMint, amount, slippage)
@@ -176,9 +229,9 @@ function TransactionCard() {
         </div>
         
        <ToCard
-       fromAmount={fromAmount}
-       toAmount={toAmount}
-       currency={toCurrency}/>
+       newAmount={newBalance}
+       currency={toCurrency}
+       />
 
        <InfoCard 
         transactionFee={transactionFee.toString()}

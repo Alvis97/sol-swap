@@ -1,52 +1,18 @@
 "use client"
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import React, { useEffect, useState } from 'react'
+import React, { JSX, useEffect, useState } from 'react'
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
 import { getSolPrices } from '../../../lib/prices';
 import { stringify } from 'querystring';
 
 type ToCardProps = {
-    fromAmount: string
-    toAmount: string
-    currency: string
+    newAmount: number | null;
+    currency: string;
 }
 
-function ToCard({fromAmount, currency, toAmount}: ToCardProps) {
+function ToCard({newAmount, currency}: ToCardProps) {
     const [balance, setBalance] = useState<number | null>(null);
-    const [convertedBalance, setConvertedBalance] = useState<number | null>(null)
-    const { publicKey } = useWallet();
-    const { connection } = useConnection()
-    
-    useEffect(() => {
-        if (!publicKey) return;
-
-        console.log(toAmount);
-            
-        async function fetchBalance() {
-            try{
-            if (currency === "USDC"){
-                const usdcBal = await getUsdBalance(publicKey!, connection)
-                const solPrice = await getSolPrices()
-                const convertedBal = usdcBal / solPrice
-                setBalance(usdcBal)
-                setConvertedBalance(convertedBal)
-
-            } else if (currency === "SOL") {
-                const bal= await getSolBalance(publicKey!, connection);
-                const solPrice = await getSolPrices()
-                const convertedBal = bal * solPrice // SOL * price = USDC 
-                setBalance(bal);
-                setConvertedBalance(convertedBal)
-            }
-
-            } catch(err) {
-                console.error(err);
-            }
-        }
-        fetchBalance()
-
-    }, [publicKey, connection, currency])
 
   return (
         <div className='card-base flex flex-col justify-between w-85 h-25 m-4 p-3'>
@@ -66,7 +32,7 @@ function ToCard({fromAmount, currency, toAmount}: ToCardProps) {
                  >{currency}
                  </div>
             </div>
-            <p className='flex justify-end w-40 text-4xl'>{toAmount ? parseFloat(toAmount).toFixed(2) : "0.00"}</p>
+            <p className='flex justify-end w-40 text-4xl'>{newAmount ? newAmount.toFixed(2) : "0.00"}</p>
         </div>
     </div>
   )

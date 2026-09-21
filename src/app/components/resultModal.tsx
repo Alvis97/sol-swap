@@ -8,9 +8,9 @@ type ResultModalProps = {
     onClose: () => void
     success: boolean
     txid?: string
-    fromAmount: string
+    fromAmount: number | null
     fromCurrency: string
-    toAmount: string
+    toAmount: number | null
     toCurrency: string
     error?: string
 }

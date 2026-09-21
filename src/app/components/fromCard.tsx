@@ -1,8 +1,8 @@
 "use client"
 
 type FromCardProps = {
-    amount: string
-    setAmount: (amount: string) => void
+    amount: number | null
+    setAmount: (amount: number | null) => void
     currency: string
     setCurrency: (currency: string) => void
 }
@@ -56,7 +56,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                 <button 
                 onClick={()=> {
                     if (balance !== null) {
-                        setAmount(balance?.toString())
+                        setAmount(balance)
                         setActiveMaxButton(true)
                     }  
                 }} 
@@ -85,16 +85,17 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                  )}
             </div>
             <input 
-            value={amount}
+            value={amount ?? ""}
             className='flex justify-end text-right w-40 text-4xl'
-            type="text"
+            type="number"
             inputMode='decimal'
             placeholder='o,00'
             onChange={(e) => {
                 const value = e.target.value;
-                setAmount(value);
+                setAmount(value === "" ? null : Number((value)));
                 setActiveMaxButton(false)
                 setInsufficientFunds(balance !== null && parseFloat(value) > balance)
+                console.log("input value", value)
             
             }}
              />
