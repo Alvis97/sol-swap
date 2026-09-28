@@ -9,10 +9,11 @@ import { stringify } from 'querystring';
 type ToCardProps = {
     newAmount: number | null;
     currency: string;
+    usBalance: number | undefined;
+    solBalance: number | undefined;
 }
 
-function ToCard({newAmount, currency}: ToCardProps) {
-    const [balance, setBalance] = useState<number | null>(null);
+function ToCard({newAmount, currency, usBalance, solBalance}: ToCardProps) {
 
   return (
         <div className='card-base flex flex-col justify-between w-85 h-25 m-4 p-3'>
@@ -20,7 +21,12 @@ function ToCard({newAmount, currency}: ToCardProps) {
         <div className='flex justify-between items-center text-xs'>
             <p className='font-extrabold'>To</p>
             <div className='flex items-center'>
-                <p>Balance: {balance !== null ? balance.toFixed(2): "0.00"} {currency}</p>
+                <p>
+                    Balance: {currency === "USDC" 
+                    ? usBalance ?? "0.00" 
+                    : solBalance?.toFixed(2) ?? "0.00"}{" "}
+                    {currency}
+                </p>
             </div>
         </div>
 

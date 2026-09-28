@@ -27,6 +27,7 @@ function TransactionCard() {
 
     const [balance, setBalance] = useState<number>();
     const [usBalance, setUsBalance] = useState<number>();
+    const [solBalance, setSolBalance] = useState<number>();
     const [newBalance, setNewBalance] = useState<number | null>(null);
 
     const [solPrice, setSolPrice] = useState<number>()
@@ -41,7 +42,6 @@ function TransactionCard() {
     const [swapError, setSwapError] = useState("")
 
     useEffect(() => {
-        console.log("fromAmount transactioncard", fromAmount);
 
         function convertedAmount() {
         try{
@@ -67,7 +67,8 @@ function TransactionCard() {
             }
         }
         convertedAmount()
-    }, [fromAmount])
+
+    }, [fromCurrency])
 
 
     useEffect(() => {
@@ -129,11 +130,20 @@ function TransactionCard() {
                 fetchPrices()
         }, [publicKey, connection])
 
-        //get USDC balance 
+        //fetch USDC balance 
         useEffect(() => {
             async function fetchBalance() {
                 const usdcBal = await getUsdBalance(publicKey!, connection)
                 setUsBalance(usdcBal);
+            }
+           fetchBalance()
+        }, [publicKey, connection])
+
+        //fetch SOL balance 
+        useEffect(() => {
+            async function fetchBalance() {
+                const solBal = await getSolBalance(publicKey!, connection)
+                setSolBalance(solBal);
             }
            fetchBalance()
         }, [publicKey, connection])
@@ -171,6 +181,8 @@ function TransactionCard() {
                             wrapAndUnwrapSol: true,
                             })
                         })
+
+                            console.log("step 2 done", swapRes);
 
                     const { swapTransaction } = await swapRes.json()
                     console.log("step 2 done", swapRes);
@@ -231,6 +243,8 @@ function TransactionCard() {
        <ToCard
        newAmount={newBalance}
        currency={toCurrency}
+       usBalance={usBalance}
+       solBalance={solBalance}
        />
 
        <InfoCard 
