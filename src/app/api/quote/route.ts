@@ -1,30 +1,37 @@
-import { NextResponse } from 'next/server'
-import React from 'react'
+import { quoteSchema } from '../../../../lib/validation';
 
 const API_KEY = process.env.JUPITER_API_KEY;
 
 export async function GET(request: Request) {
    try {
+if (!API_KEY) {
+  console.error("JUPITER_API_KEY is not set")
+  return Response.json({ error: "Server configuration error" }, { status: 500 })
+}
+
  const { searchParams } = new URL(request.url)
- const inputMint = searchParams.get('inputMint')
- const outputMint = searchParams.get('outputMint')
- const amount = searchParams.get('amount')
- const slippageBps = searchParams.get('slippageBps')
+ const parsed = quoteSchema.safeParse(Object.fromEntries(searchParams))
 
-  if (!inputMint || !outputMint || !amount || !slippageBps) {
-      return Response.json({ error: 'Missing parameters' }, { status: 400 })
-    }
+ if(!parsed.success) {
+  console.error("Invalid quote params:", parsed.error.issues)
+  return Response.json({ error: "Invalid parameters" }, { status: 400 })
+ }
 
-    const params = new URLSearchParams({ inputMint, outputMint, amount, slippageBps })
+ const { inputMint, outputMint, amount, slippageBps } = parsed.data
+
+    const params = new URLSearchParams({ 
+      inputMint,
+      outputMint,
+      amount : amount.toString(),
+      slippageBps : slippageBps.toString(),
+    })
 
  const response = await fetch(
       `https://api.jup.ag/swap/v1/quote?${params}`,
  { headers: {
    'x-api-key' : API_KEY!,
  }
-
- }
-    )
+ })
 
  if (!response.ok) {
    const errText = await response.text()
