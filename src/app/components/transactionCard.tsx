@@ -15,6 +15,11 @@ import { PublicKey } from '@solana/web3.js';
 import { VersionedTransaction } from '@solana/web3.js'
 import ResultModal from './resultModal';
 
+const DECIMALS: Record<string, number> = {
+  SOL: 1e9,
+  USDC: 1e6,
+}
+
 function TransactionCard() {
     const { publicKey, signTransaction } = useWallet()
     const { connection } = useConnection()
@@ -25,96 +30,56 @@ function TransactionCard() {
     const [fromAmount, setFromAmount] = useState<number | null>(null)
     const [toAmount, setToAmount] = useState<number | null>(null)
 
-    const [balance, setBalance] = useState<number>();
     const [usBalance, setUsBalance] = useState<number>();
     const [solBalance, setSolBalance] = useState<number>();
     const [newBalance, setNewBalance] = useState<number | null>(null);
 
-    const [solPrice, setSolPrice] = useState<number>()
-    const [slippage, setSlippage] = useState("0.5")
-    const [transactionFee, setTransactionFee] = useState("")
-    const [minimumReceived, setMinimumReceived] = useState("")
+    const [solPrice, setSolPrice] = useState<number | null>(null)
+    const [slippageBps, setSlippageBps] = useState<number>(50) //0.5 slippage
+    const [minimumReceived, setMinimumReceived] = useState<number | null>(null);
+    const [quote, setQuote] = useState<any | null>(null)
 
-    const [ isLoading, setIsLoading ] = useState(false)
+    const [isLoading, setIsLoading ] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
     const [swapSuccess, setSwapSuccess] = useState(false)
     const [txid, setTxid] = useState("")
     const [swapError, setSwapError] = useState("")
 
-    useEffect(() => {
+    const BASE_FEE_SOL = 0.000005;
 
-        function convertedAmount() {
-        try{
-            if (fromCurrency === "USDC"){
-
-                if (usBalance !== undefined && solPrice !== solPrice){
-                    const convertedUsBal = usBalance! / solPrice! //USCD / price = SOL
-                    setNewBalance(convertedUsBal)
-                    console.log("ConvertedBalance from USDC transactionCard:", convertedUsBal)
-                }
-   
-            } else if (fromCurrency === "SOL") {
-
-                if (fromAmount !== null && solPrice !== undefined) {
-                    const convertedBal = fromAmount * solPrice // SOL * price = USDC 
-                    setNewBalance(convertedBal)
-                    console.log("ConvertedBalance to SOL", convertedBal)
-                }
-            }
-
-            } catch(err) {
-                console.error(err);
-            }
-        }
-        convertedAmount()
-
-    }, [fromCurrency])
-
-
+    //Get quote
     useEffect(() => {
         const fromAmountNum = (fromAmount);
  
-    
-        if (!fromAmount || !slippage ) return
-    
+        if (!fromAmount || !slippageBps ) return
 
+        let cancelled = false
+    
         async function fetchQuote() {
 
             try{
+                const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
                 //checking what currency
                 const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT
                 const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
-                const inputDecimals = fromCurrency === "USDC" ? 1e6 : 1e9
-                const outputDecimals = fromCurrency === "USDC" ? 1e6 : 1e9
+                const inputDecimals = DECIMALS[fromCurrency]
+                const outputDecimals = DECIMALS[toCurrency]
 
-                if (fromAmount !== null) {
-                    const amount = Math.floor(fromAmount * inputDecimals)
+                const amount = Math.floor(fromAmount! * inputDecimals)
+                const q = await getQuote(inputMint, outputMint, amount, slippageBps)
+                if (cancelled) return 
 
-                    const quote = await getQuote(inputMint, outputMint, amount, slippage)
-                    console.log("FULL QUOTE:", quote)
+                setQuote(q)
+                setToAmount(Number(q.outAmount) / outputDecimals)
+                console.log("to amount:", toAmount)
+                setMinimumReceived(Number(q.otherAmountThreshold) / outputDecimals)
+            } catch (err) {
+                console.log(err)
+            }    
 
-                    //Caluculate new amount
-                    if (fromCurrency === "USDC") {
-                        setToAmount((quote.outAmount / 1e9)) //Finns inget som heter out amount
-                        console.log("toAmount:", toAmount);
-                    } else {
-                        setToAmount((quote.outAmount / 1e6))
-                        console.log("toAmount:", toAmount);
-                    }
-
-                    setMinimumReceived((quote.otherAmountThreshold / 1e9).toString())
-                    
-                    setTransactionFee("0.000005")
-                    console.log("quote:", quote)
-                } 
-    
-
-            } catch(err) {
-                console.error(err)
-            }
         } 
         fetchQuote()
-        }, [fromAmount, fromCurrency, slippage, solPrice])
+        }, [fromAmount, fromCurrency, slippageBps])
 
 
         //Fetch SOL-prices
@@ -148,18 +113,16 @@ function TransactionCard() {
            fetchBalance()
         }, [publicKey, connection])
 
-
         //Switch cards
         function SwitchCards() {
             setFromCurrency(toCurrency)
             setFromAmount(toAmount)
         }
 
-
         //ExecudeSwap
         async function ExecudeSwap() {
             if(!publicKey || !signTransaction) return
-            if(!fromAmount || !slippage ) return
+            if(!fromAmount || !slippageBps ) return
 
                 setIsLoading(true)
                 try {
@@ -168,23 +131,25 @@ function TransactionCard() {
                     const amount = (fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
 
                     //get quote step 1
-                    const quote = await getQuote(inputMint, outputMint, amount, slippage)
+                    const quote = await getQuote(inputMint, outputMint, amount, slippageBps)
                     console.log("Step one done", quote);
 
                     //get swaptransaction from jupiter step 2
-                    const swapRes = await fetch("https://quote-api.jup.ag/v6/swap", {
+                    const swapRes = await fetch("/api/swap", {
                         method: "POST",
                         headers: {"Content-Type": "application/json"},
                         body: JSON.stringify({
                             quoteResponse: quote,
-                            userPublickey: publicKey.toString(),
-                            wrapAndUnwrapSol: true,
+                            userPublicKey: publicKey.toString(),
                             })
                         })
 
-                            console.log("step 2 done", swapRes);
+                        if (!swapRes.ok) {
+                            const  { error } = await swapRes.json()
+                            throw new Error(error || "Failed to build swap transaction")
+                        }
 
-                    const { swapTransaction } = await swapRes.json()
+                        const { swapTransaction } = await swapRes.json()
                     console.log("step 2 done", swapRes);
 
                     //Convert transaction step 3
@@ -220,8 +185,8 @@ function TransactionCard() {
     <div className='flex flex-col w-fit h-full items-center justify-center'>
 
         <SwapInfo
-          slippage={slippage}
-          setSlippage={setSlippage}
+          slippageBps={slippageBps}
+          setSlippageBps={setSlippageBps}
         />
 
        <FromCard
@@ -241,15 +206,15 @@ function TransactionCard() {
         </div>
         
        <ToCard
-       newAmount={newBalance}
+       newAmount={toAmount}
        currency={toCurrency}
        usBalance={usBalance}
        solBalance={solBalance}
        />
 
        <InfoCard 
-        transactionFee={transactionFee.toString()}
-        slippage={slippage.toString()}
+        transactionFee={BASE_FEE_SOL}
+        slippageBps={slippageBps}
         minimumReceived={minimumReceived}    
         />
 

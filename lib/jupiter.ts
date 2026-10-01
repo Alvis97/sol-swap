@@ -5,18 +5,22 @@ export async function getQuote(
     inputMint: string,
     outputMint: string,
     amount: number,
-    slippage: string
+    slippageBps: number
 ) {
+  const params = new URLSearchParams({
+    inputMint,
+    outputMint,
+    amount: amount.toString(),
+    slippageBps: slippageBps.toString(),
+  })
 
-    const slippageBps = parseFloat(slippage) * 100 //Jupiter uses basis point
-
-    const response = await fetch(
-        `/api/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=${slippageBps}`
+  console.log("params: ", inputMint, outputMint, amount, slippageBps);
+    const response = await fetch(`/api/quote?${params}`
     )
 
-    const data = await response.json()
-    console.log("getQuote",data);
-    return data
+    if (!response.ok) {
+        throw new Error(`Quote failed: {reponse.status}`)
+    }
 
-
+    return response.json()
 }

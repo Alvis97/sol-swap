@@ -5,11 +5,17 @@ import React, { useEffect, useState } from 'react'
 import { getSolPrices } from '../../../lib/prices';
 
 type SwapInfoProps = {
-    slippage: string
-    setSlippage: (slippage: string) => void
+    slippageBps: number
+    setSlippageBps: (slippage: number) => void
 }
 
-function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
+const SLIPPAGE_OPTIONS = [
+    { label: '0.1', bps: 10 },
+    { label: "0.5", bps: 50 },
+    { label: "1", bps: 100},
+] 
+
+function swapInfo({ slippageBps, setSlippageBps } : SwapInfoProps ) {
   const [ modalOpen, setModalOpen ] = useState(false);
   const [ currentValue, setCurrentValue ] = useState("");
 
@@ -48,56 +54,33 @@ function swapInfo({ slippage, setSlippage } : SwapInfoProps ) {
                 <div className='flex flex-col w-full items-start'>
                 <p>Select your slippage:</p>
                 <div className='flex my-5 w-45 justify-between'>
-                <button 
-                    onClick={()=> setSlippage("0.1")}
-                    className={`${slippage === "0.1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
-                        0,1
-                </button>
-                <button 
-                    onClick={() => setSlippage("0.5")}
-                    className={`${slippage === "0.5" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
-                    0,5
-                </button>
-                <button 
-                    onClick={() => setSlippage("1")}
-                    className={ `${slippage === "1" ? "card-inside" : "button-base"} h-[50px] w-[50px] rounded-full`}>
-                    1
+         
+                {SLIPPAGE_OPTIONS.map(({ label, bps }) => (
+                    <button
+                    key={bps}
+                    onClick={() => setSlippageBps(bps)}
+                    className={`${slippageBps === bps ? 'card-inside' : 'button-base'} h-[50px] w-[50px] rounded-full`}
+                    >
+                    {label}    
                     </button>
+                ))}
                 </div>
-           
-                <input 
-                className='w-30 p-2 border rounded-md border-gray-300'
-                type="number" 
-                placeholder='Custom' 
-                min="0.1"
-                max="100"
-                step="0.1"
-                onBlur={(e) => setSlippage(e.target.value)}
-                />
-
                 <button className='button-submit bg-[var(--hoverColor)] text-xs py-3 px-4 mt-5' onClick={()=> setModalOpen(false)}>Select</button>
-
                 </div>
          </div>
         </div> 
         )}  
-         
-
-
 
         <div className='card-inside flex justify-center items-center  p-3 mr-4 w-fit text-xs'>
             <p>1 SOL = {currentValue} USDC</p>
-            
         </div>
-
         <div>
             <button 
             className='flex justify-center items-center button-base text-xs p-3'
             onClick={()=> setModalOpen(true)}>
-                {slippage}%
+                {slippageBps/100}%
             </button>
         </div>
-
     </div>
   )
 }

@@ -3,12 +3,12 @@ import { CircleQuestionMark } from 'lucide-react'
 import React from 'react'
 
 type InfoCardProps = {
-    transactionFee: string
-    slippage: string
-    minimumReceived: string
+    transactionFee: number | null
+    slippageBps: number | null
+    minimumReceived: number | null
 }
 
-function InfoCard({ transactionFee, slippage, minimumReceived } : InfoCardProps ) {
+function InfoCard({ transactionFee, slippageBps, minimumReceived } : InfoCardProps ) {
   return (
     <div className='card-inside p-3 m-3 w-70 text-xs leading-4'>
         <p className='flex items-center gap-1'>
@@ -19,7 +19,7 @@ function InfoCard({ transactionFee, slippage, minimumReceived } : InfoCardProps 
                      A small fee charged to process your payment securely.
                 </span> 
             </span>
-          : {transactionFee}
+          : {transactionFee} SOL
         </p>
         <p className='flex items-center'>
             Slippage 
@@ -30,7 +30,7 @@ function InfoCard({ transactionFee, slippage, minimumReceived } : InfoCardProps 
                     when your transaction is executed. Higher during volatile markets.
                 </span>
             </span>
-             : {slippage}
+             : {slippageBps!/100}%
         </p>
         <p>Minimum received: {minimumReceived}</p>
     </div>

@@ -23,7 +23,7 @@ function ToCard({newAmount, currency, usBalance, solBalance}: ToCardProps) {
             <div className='flex items-center'>
                 <p>
                     Balance: {currency === "USDC" 
-                    ? usBalance ?? "0.00" 
+                    ? usBalance?.toFixed(2) ?? "0.00" 
                     : solBalance?.toFixed(2) ?? "0.00"}{" "}
                     {currency}
                 </p>
