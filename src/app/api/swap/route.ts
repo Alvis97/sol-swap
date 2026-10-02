@@ -1,19 +1,25 @@
 import { NextResponse } from 'next/server'
 import React from 'react'
+import { swapSchema } from '../../../../lib/validation'
 
 const API_KEY = process.env.JUPITER_API_KEY
 
 export async function POST(request: Request) {
    try{
      if (!API_KEY) {
-        return Response.json({ error: "Missing Api key" }, { status: 500 })
+        console.error("JUPITER_API_KEY is not set")
+        return Response.json({ error: "Server configuration error" }, { status: 500 })
      }
 
-     const { quoteResponse, userPublicKey } = await request.json()
+     const body = await request.json().catch(() => null)
+     const parsed = swapSchema.safeParse(body)
 
-     if (!quoteResponse || !userPublicKey) {
-        return Response.json({ error: "Missing parameters" }, { status: 400})
+     if(!parsed.success) {
+        console.error("Invalid swap body:", parsed.error.issues)
+        return Response.json({ error: "Invalid parameters" }, { status: 400 })
      }
+
+     const { quoteResponse, userPublicKey } = parsed.data
 
      const response = await fetch("https://api.jup.ag/swap/v1/swap", {
         method: "POST",
@@ -38,10 +44,8 @@ export async function POST(request: Request) {
      const data = await response.json()
      return Response.json(data)
 
-
    } catch(err) {
     console.error("Swap route error: ", err)
     return Response.json({ error: String(err) }, { status: 500 })
-
    }
 }
