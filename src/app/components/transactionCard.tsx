@@ -14,6 +14,7 @@ import { getQuote, SOL_MINT, USDC_MINT } from '../../../lib/jupiter'
 import { PublicKey } from '@solana/web3.js';
 import { VersionedTransaction } from '@solana/web3.js'
 import ResultModal from './resultModal';
+import { verifySwapTx } from '../../../lib/verifyTx';
 
 const DECIMALS: Record<string, number> = {
   SOL: 1e9,
@@ -157,6 +158,8 @@ function TransactionCard() {
                         Buffer.from(swapTransaction, "base64")
                     )
                     console.log("Step 3 done", transaction)
+
+                    verifySwapTx(transaction, publicKey)
 
                     //Sign Transaction step 4
                     const signedTx = await signTransaction(transaction)
