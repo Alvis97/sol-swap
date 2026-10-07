@@ -170,7 +170,10 @@ function TransactionCard() {
                     console.log("step 5 done", txid);
 
                     // confirm transaction step 6
-                    await connection.confirmTransaction(txid, "confirmed")
+                    const res = await connection.confirmTransaction(txid, "confirmed")
+                    if (res.value.err) {
+                        throw new Error("Transaction failed on-chain")
+                    }
                     console.log("Successfull Swap step 6", txid)
                     setTxid(txid)
                     setSwapSuccess(true)
@@ -181,6 +184,8 @@ function TransactionCard() {
                     setSwapError(err instanceof Error ? err.message : "Something went wrong")
                     setSwapSuccess(false)
                     setModalOpen(true)
+                } finally {
+                    setIsLoading(true)
                 }
         }
 
