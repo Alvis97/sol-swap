@@ -15,30 +15,28 @@ type ToCardProps = {
 
 function ToCard({newAmount, currency, usBalance, solBalance}: ToCardProps) {
 
+        const { publicKey } = useWallet();
+        const balance = currency === "USDC" ? usBalance : solBalance
+
   return (
         <div className='card-base flex flex-col justify-between w-85 h-25 m-4 p-3'>
         {/* top part */}
         <div className='flex justify-between items-center text-xs'>
             <p className='font-extrabold'>To</p>
             <div className='flex items-center'>
+                { publicKey && (
                 <p>
-                    Balance: {currency === "USDC" 
-                    ? usBalance?.toFixed(2) ?? "0.00" 
-                    : solBalance?.toFixed(2) ?? "0.00"}{" "}
-                    {currency}
+                    Balance: {(balance ?? 0).toFixed(2)} {currency}
                 </p>
+                )}
+   
             </div>
         </div>
 
         {/* bottom part */}
-        <div className='flex items-center justify-between '>
-            <div className='relative'>
-                <div
-                 className='button-base flex items-cente text-xs rounded-lg justify-between p-3'
-                 >{currency}
-                 </div>
-            </div>
-            <p className='flex justify-end w-40 text-4xl'>{newAmount ? newAmount.toFixed(2) : "0.00"}</p>
+        <div className='flex items-baseline justify-between '>
+    
+            <p className='flex justify-end items-baseline w-100 text-4xl text-[var(--foreground)]/60'>{newAmount ? newAmount.toFixed(2) : "0.00"} <span className='text-xl'>{currency}</span></p>
         </div>
     </div>
   )

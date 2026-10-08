@@ -18,6 +18,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     const [insufficientFounds, setInsufficientFunds] = useState(false)
     const { publicKey } = useWallet();
     const { connection } = useConnection();
+    const balanceText = publicKey && balance != null ? `${balance.toFixed(2)} ${currency}` : "---"
 
     useEffect(() => {
  
@@ -42,17 +43,13 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     }, [publicKey, connection, currency])
 
   return (
-    <div className='card-base flex flex-col justify-between w-85 h-28 m-4 p-3'>
+    <div className='card-base flex flex-col justify-between w-85 h-fit m-4 p-3'>
         {/* top part */}
-        <div className='flex justify-between items-start text-xs'>
+        <div className='flex justify-between items-start text-xs mb-4'>
             <p className='font-extrabold'>From</p>
             <div className='flex items-start'>
-                { !publicKey ? (
-                    <p className='text-rose-800'>Not Connected</p>
-                ) 
-                : (
-                    <p>Balance: {balance !== null ? balance.toFixed(2): "0.00"} {currency}</p>
-                )}
+                <p className='text-[var(--foreground)]/60'>Balance: {balanceText}</p>
+                { publicKey && (
                 <button 
                 onClick={()=> {
                     if (balance !== null) {
@@ -63,6 +60,8 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                 className={ `${activeMaxButton === true ? "card-inside" : "button-base"} rounded-lg  p-2 ml-4`}>
                     Max
                 </button>
+                )}
+
             </div>
         </div>
 
@@ -86,10 +85,10 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
             </div>
             <input 
             value={amount ?? ""}
-            className='flex justify-end text-right w-40 text-4xl'
+            className='flex justify-end text-right w-40 text-4xl placeholder:text-[var(--foreground)]/100'
             type="number"
             inputMode='decimal'
-            placeholder='o,00'
+            placeholder='o.00'
             onChange={(e) => {
                 const value = e.target.value;
                 setAmount(value === "" ? null : Number((value)));
@@ -101,7 +100,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
              />
         </div>
         {insufficientFounds && (
-    <p className="text-red-500 text-xs">Insufficient funds</p>
+    <p className="flex text-red-500 text-xs justify-end mr-3">Insufficient funds</p>
 )}
     </div>
   )

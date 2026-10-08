@@ -7,6 +7,7 @@ import { getSolPrices } from '../../../lib/prices';
 type SwapInfoProps = {
     slippageBps: number
     setSlippageBps: (slippage: number) => void
+    solPrice: number | null
 }
 
 const SLIPPAGE_OPTIONS = [
@@ -15,28 +16,14 @@ const SLIPPAGE_OPTIONS = [
     { label: "1", bps: 100},
 ] 
 
-function swapInfo({ slippageBps, setSlippageBps } : SwapInfoProps ) {
+function swapInfo({ slippageBps, setSlippageBps, solPrice } : SwapInfoProps ) {
   const [ modalOpen, setModalOpen ] = useState(false);
-  const [ currentValue, setCurrentValue ] = useState("");
+  const [ currentValue, setCurrentValue ] = useState<number | null>(null);
 
-    useEffect(() => {
-    async function fetchPrice() {
-   try{
-        const price = await getSolPrices()
-        setCurrentValue(price.toString())
-    } catch(err) {
-      console.error(err);
-    }
-    }
- 
-    fetchPrice()
-    const interval = setInterval(fetchPrice, 30000)
-    
-    return () => clearInterval(interval);
-  }, [])
+
 
   return (
-    <div className='flex w-full px-4 pt-2 mb-2 items-center justify-end'>
+    <div className='flex w-full px-4 pt-2 mb-2 items-center justify-between'>
 
     {/* modal */}
     { modalOpen === true && (
@@ -72,7 +59,7 @@ function swapInfo({ slippageBps, setSlippageBps } : SwapInfoProps ) {
         )}  
 
         <div className='card-inside flex justify-center items-center  p-3 mr-4 w-fit text-xs'>
-            <p>1 SOL = {currentValue} USDC</p>
+            <p>1 SOL = {solPrice != null ? solPrice.toFixed(2) : "..."} USDC</p>
         </div>
         <div>
             <button 

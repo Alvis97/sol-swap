@@ -1,3 +1,4 @@
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { Transaction } from '@solana/web3.js'
 import { CircleQuestionMark } from 'lucide-react'
 import React from 'react'
@@ -9,8 +10,9 @@ type InfoCardProps = {
 }
 
 function InfoCard({ transactionFee, slippageBps, minimumReceived } : InfoCardProps ) {
+    const { publicKey } = useWallet();
   return (
-    <div className='card-inside p-3 m-3 w-70 text-xs leading-4'>
+    <div className='card-inside px-3 py-2 m-3 w-80 text-xs leading-5'>
         <p className='flex items-center gap-1'>
             Transaction fee 
             <span className='relative group'>
@@ -19,20 +21,20 @@ function InfoCard({ transactionFee, slippageBps, minimumReceived } : InfoCardPro
                      A small fee charged to process your payment securely.
                 </span> 
             </span>
-          : {transactionFee} SOL
+          : {!publicKey ? "---" : transactionFee + "SOL"}
         </p>
         <p className='flex items-center'>
-            Slippage 
+            Slippage  
             <span className='relative group'>
-                <CircleQuestionMark size="16px" className='cursor-pointer'/>
+                <CircleQuestionMark size="16px" className='cursor-pointer mx-1'/>
                 <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-80 p-2 rounded-md text-xs hidden group-hover:block bg-[var(--background)] border border-gray-200'>
                     The difference between the expected price and the actual price
                     when your transaction is executed. Higher during volatile markets.
                 </span>
             </span>
-             : {slippageBps!/100}%
+            : {slippageBps!/100}%
         </p>
-        <p>Minimum received: {minimumReceived}</p>
+        <p>Minimum received: {!publicKey ? "---" : minimumReceived}</p>
     </div>
   )
 }

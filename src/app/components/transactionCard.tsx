@@ -94,6 +94,8 @@ function TransactionCard() {
                     }
                 }
                 fetchPrices()
+                const interval = setInterval(fetchPrices, 30000)
+                return () => clearInterval(interval);
         }, [publicKey, connection])
 
         //fetch USDC balance 
@@ -195,6 +197,7 @@ function TransactionCard() {
         <SwapInfo
           slippageBps={slippageBps}
           setSlippageBps={setSlippageBps}
+          solPrice={solPrice}
         />
 
        <FromCard
@@ -204,13 +207,14 @@ function TransactionCard() {
        setCurrency={setFromCurrency}
        />
 
-        <div className='relative flex flex-col justify-center items-center w-full py-5'>
-            <hr  className='w-[80%] text-stone-300'/>
+        <div className='relative flex flex-row justify-between items-center w-[90%] py-0'>
+            <hr  className='w-full text-stone-400'/>
             <button 
-                className='absolute button-submit p-3'
+                className='button-submit p-3 mx-3'
                 onClick={SwitchCards}>
                 <ArrowUpDown size={18}/>
             </button>
+            <hr  className='w-full text-stone-400'/>
         </div>
         
        <ToCard
@@ -231,7 +235,7 @@ function TransactionCard() {
        onClick={ExecudeSwap}
        disabled={!publicKey || !fromAmount || isLoading}
        >
-        {isLoading ? "Swapping..." : "Swap Token "}
+        {!publicKey ? "Connect wallet to swap.." : isLoading ? "Swapping..." : "Swap Token "}
         </button>
 
 

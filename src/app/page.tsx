@@ -16,12 +16,11 @@ export default function Home() {
         {/* card display */}
         <div className="flex-1">
           { selectedCard === "swap" && <TransactionCard/>}
-          { selectedCard === "chart" && <p> Chart </p>}
           { selectedCard === "history" && <p> HIstory</p>}
         </div>
 
         {/* bottom navigation */}
-        <div className="card-base flex items-center justify-between p-3 w-40 ">
+        <div className="card-base flex items-center justify-between p-3 w-25 ">
 
           <button 
           onClick={() => setSelectedCard("swap")}
@@ -29,13 +28,6 @@ export default function Home() {
           >
             <ArrowDownUp size={selectedCard === "swap" ? 28 : 24}/>
           </button>
-
-          <button 
-          onClick={() => setSelectedCard("chart")}
-             className={selectedCard === "chart" ? "text-black" : "text-stone-400"}
-          >
-            <ChartSpline size={selectedCard === "chart" ? 28 : 24}/>
-            </button>
 
           <button 
           onClick={() => setSelectedCard("history")}
