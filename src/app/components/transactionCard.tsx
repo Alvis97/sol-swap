@@ -15,15 +15,20 @@ import { PublicKey } from '@solana/web3.js';
 import { VersionedTransaction } from '@solana/web3.js'
 import ResultModal from './resultModal';
 import { verifySwapTx } from '../../../lib/verifyTx';
+import { useWalletModal } from "@solana/wallet-adapter-react-ui"
 
 const DECIMALS: Record<string, number> = {
   SOL: 1e9,
   USDC: 1e6,
 }
 
+type SwapState = "connect" | "loading" | "enter" | "insufficient" | "ready"
+
 function TransactionCard() {
     const { publicKey, signTransaction } = useWallet()
     const { connection } = useConnection()
+
+    const { setVisible } = useWalletModal()
 
     const [fromCurrency, setFromCurrency] = useState("USDC")
     const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
@@ -47,6 +52,37 @@ function TransactionCard() {
     const [swapError, setSwapError] = useState("")
 
     const BASE_FEE_SOL = 0.000005;
+    const isConnected = !!publicKey
+    const balance = fromCurrency === "USDC" ? usBalance : solBalance
+    const insufficientFunds = balance != null && fromAmount != null && fromAmount > balance
+    const isNotReady = isConnected && (!fromAmount || insufficientFunds)
+
+    const swapState: SwapState = !isConnected
+  ? "connect"
+  : isLoading
+  ? "loading"
+  : !fromAmount
+  ? "enter"
+  : insufficientFunds
+  ? "insufficient"
+  : "ready"
+
+const buttonText: Record<SwapState, string> = {
+  connect: "Connect wallet",
+  loading: "Swapping...",
+  enter: "Swap Token",
+  insufficient: "Insufficient balance",
+  ready: "Swap Token",
+}
+
+const buttonStyle: Record<SwapState, string> = {
+  connect: "bg-violet-800 text-white hover:bg-violet-700",
+  ready: "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer",
+  loading: "card-inside text-[var(--foreground)]/50 cursor-not-allowed animate-pulse",
+  enter: "button-base text-[var(--foreground)]/50 cursor-not-allowed",
+  insufficient: "button-base bg-red-800 cursor-not-allowed",
+}
+  
 
     //Get quote
     useEffect(() => {
@@ -116,10 +152,21 @@ function TransactionCard() {
            fetchBalance()
         }, [publicKey, connection])
 
+
         //Switch cards
         function SwitchCards() {
             setFromCurrency(toCurrency)
             setFromAmount(toAmount)
+        }
+
+        //Handle swap click
+        function handleSwap() {
+              console.log("clicked, publicKey:", publicKey?.toString())
+            if(!publicKey) {
+                setVisible(true)
+                return
+            }
+            ExecudeSwap()
         }
 
         //ExecudeSwap
@@ -230,12 +277,12 @@ function TransactionCard() {
         minimumReceived={minimumReceived}    
         />
 
-       <button 
-       className='button-submit p-3 m-3 w-80'
-       onClick={ExecudeSwap}
-       disabled={!publicKey || !fromAmount || isLoading}
-       >
-        {!publicKey ? "Connect wallet to swap.." : isLoading ? "Swapping..." : "Swap Token "}
+        <button
+        className={`p-3 m-3 w-80 rounded-2xl font-semibold transition ${buttonStyle[swapState]}`}
+        onClick={handleSwap}
+        disabled={isLoading || isNotReady}
+        >
+        {buttonText[swapState]}
         </button>
 
 
