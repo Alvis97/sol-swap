@@ -99,9 +99,6 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
             }}
              />
         </div>
-        {insufficientFounds && (
-    <p className="flex text-red-500 text-xs justify-end mr-3">Insufficient funds</p>
-)}
     </div>
   )
 }
