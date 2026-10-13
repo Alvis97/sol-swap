@@ -228,13 +228,17 @@ const buttonStyle: Record<SwapState, string> = {
                     setSwapSuccess(true)
                     setModalOpen(true)
 
+                    setFromAmount(null)
+                    setToAmount(null)          // se nedan om 0 eller null
+                    setMinimumReceived(null)
+
                 } catch(err) {
                     console.error("Swap failed:", err)
                     setSwapError(err instanceof Error ? err.message : "Something went wrong")
                     setSwapSuccess(false)
                     setModalOpen(true)
                 } finally {
-                    setIsLoading(true)
+                    setIsLoading(false)
                 }
         }
 

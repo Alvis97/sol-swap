@@ -5,6 +5,7 @@
   --foreground: #343434;
   --hoverColor: #c1c1c1;
   --submitBtn: #9e9e9e;
+
 }
 
 @theme inline {
@@ -83,10 +84,10 @@ input{
 
  @media (prefers-color-scheme: dark) {
   .button-submit {
-    background-color:#212021;;
+    background-color:#1e1e1e;;
     color: white;
     box-shadow:
-      -6px -6px 12px rgba(255, 255, 255, 0.10),
+      -4px -4px 12px rgba(255, 255, 255, 0.10),
        6px  6px 12px rgba(0, 0, 0, 0.782);
   }
 }
