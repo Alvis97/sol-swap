@@ -20,7 +20,7 @@ function resultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
 
   return (
     <div className='fixed inset-0 flex items-center justify-center z-50 bg-black/50'>
-      <div className='bg-stone-900 border border-stone-700 rounded-2xl p-6 w-80 flex flex-col gap-4'>
+      <div className='bg-stone-900 border border-stone-700 rounded-2xl p-6 w-80 flex flex-col items-center gap-4'>
         
         <button onClick={onClose} className='absolute top-4 right-4 text-stone-400 hover:text-stone-600'>
           <X size={18} />
@@ -31,7 +31,7 @@ function resultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
             ? <CheckCircle size={48} className='text-green-500' />
             : <XCircle size={48} className='text-red-500' />
           }
-          <h2 className='font-semibold text-lg'>
+          <h2 className='font-semibold text-base mt-2'>
             {success ? "Swap was Successfull!" : "Swap Failed :("}
           </h2>
         </div>
@@ -58,14 +58,16 @@ function resultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
             href={`https://solscan.io/tx/${txid}`}
             target='_blank'
             rel='noopener noreferrer'
-            className='flex items-center justify-center gap-2 text-sm text-blue-400 hover:text-blue-500'
+            className='flex items-center justify-center gap-2 text-xs text-blue-400 hover:text-blue-500'
           >
             View Transaction on Solscan <ExternalLink size={14} />
           </a>
         )}
 
-        <button className='button-submit p-2 w-full'>
-          Stäng
+        <button 
+        className='button-submit p-2 mt-4 w-full '
+        onClick={onClose}>
+          Close
         </button>
 
       </div>
