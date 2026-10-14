@@ -227,9 +227,6 @@ const buttonStyle: Record<SwapState, string> = {
                     setTxid(txid)
                     setSwapSuccess(true)
                     setModalOpen(true)
-
-                    setFromAmount(null)
-                    setToAmount(null)          // se nedan om 0 eller null
                     setMinimumReceived(null)
 
                 } catch(err) {
@@ -239,6 +236,7 @@ const buttonStyle: Record<SwapState, string> = {
                     setModalOpen(true)
                 } finally {
                     setIsLoading(false)
+
                 }
         }
 
@@ -293,7 +291,14 @@ const buttonStyle: Record<SwapState, string> = {
         { modalOpen && (
             <ResultModal
                 isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
+                  onClose={() => {
+                setModalOpen(false)
+                if (swapSuccess) {
+                setToAmount(null)
+                setFromAmount(null)
+                setMinimumReceived(null)
+                }
+            }}
                 success={swapSuccess}
                 txid={txid}
                 fromAmount={fromAmount}
