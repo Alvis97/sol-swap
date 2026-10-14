@@ -4,13 +4,14 @@
   --background: #E7E7E7;
   --foreground: #343434;
   --hoverColor: #c1c1c1;
-  --submitBtn: #9e9e9e;
+  --submitBtn: #c6c5c5;
 
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-submitBtn: var(--submitBtn);
   --font-unbounded: var(--font-unbounded-sans);
 }
 

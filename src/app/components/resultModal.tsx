@@ -20,7 +20,7 @@ function resultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
 
   return (
     <div className='fixed inset-0 flex items-center justify-center z-50 bg-black/50'>
-      <div className='bg-stone-900 border border-stone-700 rounded-2xl p-6 w-80 flex flex-col items-center gap-4'>
+      <div className='bg-[var(--background)] border border-[var(--submitBtn)] rounded-2xl p-6 w-80 flex flex-col items-center gap-4'>
         
         <button onClick={onClose} className='absolute top-4 right-4 text-stone-400 hover:text-stone-600'>
           <X size={18} />
@@ -37,13 +37,13 @@ function resultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
         </div>
 
           {success && (
-          <div className='bg-stone-100 dark:bg-stone-900 rounded-xl p-4 flex flex-col gap-1 text-sm'>
+          <div className='bg-mist-100 dark:bg-neutral-600 rounded-xl p-4 flex flex-col gap-1 text-sm'>
             <div className='flex justify-between'>
-              <span className='text-stone-500'>Skickade</span>
+              <span className='text-neutral-400'>Sent:</span>
               <span className='font-medium'>{fromAmount} {fromCurrency}</span>
             </div>
             <div className='flex justify-between'>
-              <span className='text-stone-500'>Fick</span>
+              <span className='text-neutral-400'>Recived:</span>
               <span className='font-medium'>{toAmount} {toCurrency}</span>
             </div>
           </div>
@@ -65,7 +65,7 @@ function resultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
         )}
 
         <button 
-        className='button-submit p-2 mt-4 w-full '
+        className='button-submit p-2 mt-2 w-full '
         onClick={onClose}>
           Close
         </button>
