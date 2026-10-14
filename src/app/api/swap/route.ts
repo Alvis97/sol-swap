@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 import React from 'react'
 import { swapSchema } from '../../../../lib/validation'
+import { guard } from '../../../../lib/guard'
 
 const API_KEY = process.env.JUPITER_API_KEY
 
 export async function POST(request: Request) {
+
+    const blocked = await guard(request, "swap")
+    if (blocked) return blocked
+
    try{
      if (!API_KEY) {
         console.error("JUPITER_API_KEY is not set")
@@ -38,7 +43,7 @@ export async function POST(request: Request) {
      if (!response.ok) {
         const errText = await response.text()
         console.error("Jupiter swap error: ", response.status, errText)
-        return Response.json({ error: errText}, { status: response.status})
+        return Response.json({ error: errText}, { status: 502})
      }
 
      const data = await response.json()
@@ -46,6 +51,6 @@ export async function POST(request: Request) {
 
    } catch(err) {
     console.error("Swap route error: ", err)
-    return Response.json({ error: String(err) }, { status: 500 })
+    return Response.json({ error: "Internal server error" }, { status: 500 })
    }
 }
