@@ -33,6 +33,7 @@ function TransactionCard() {
     const [fromCurrency, setFromCurrency] = useState("USDC")
     const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
 
+    const [amountText, setAmountText] = useState("")
     const [fromAmount, setFromAmount] = useState<number | null>(null)
     const [toAmount, setToAmount] = useState<number | null>(null)
 
@@ -88,11 +89,15 @@ const buttonStyle: Record<SwapState, string> = {
     useEffect(() => {
         const fromAmountNum = (fromAmount);
  
-        if (!fromAmount || !slippageBps ) return
+        if (!fromAmount || !slippageBps ) {
+            setToAmount(null)
+            setFromAmount(null)
+            return
+        }    
 
         let cancelled = false
-    
-        async function fetchQuote() {
+
+        const timer = setTimeout(async () => {
 
             try{
                 const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
@@ -112,10 +117,13 @@ const buttonStyle: Record<SwapState, string> = {
                 setMinimumReceived(Number(q.otherAmountThreshold) / outputDecimals)
             } catch (err) {
                 console.log(err)
-            }    
-
-        } 
-        fetchQuote()
+            }   
+        }, 1000)
+    
+        return () => {
+            cancelled = true
+            clearTimeout(timer)
+        }
         }, [fromAmount, fromCurrency, slippageBps])
 
 

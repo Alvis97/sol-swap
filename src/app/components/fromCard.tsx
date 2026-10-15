@@ -19,6 +19,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     const { publicKey } = useWallet();
     const { connection } = useConnection();
     const balanceText = publicKey && balance != null ? `${balance.toFixed(2)} ${currency}` : "---"
+    const [amountText, setAmountText] = useState("")
 
     useEffect(() => {
  
@@ -84,14 +85,16 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                  )}
             </div>
             <input 
-            value={amount ?? ""}
+            value={amountText}
             className='flex justify-end text-right w-40 text-4xl placeholder:text-[var(--foreground)]/100'
-            type="number"
+            type="text"
             inputMode='decimal'
             placeholder='o.00'
             onChange={(e) => {
-                const value = e.target.value;
-                setAmount(value === "" ? null : Number((value)));
+                const value = e.target.value.replace(",", ".");
+                if (!/^\d*\.?\d*$/.test(value)) return
+                setAmountText(value);
+                setAmount(value === "" ? null : Number(value))
                 setActiveMaxButton(false)
                 setInsufficientFunds(balance !== null && parseFloat(value) > balance)
                 console.log("input value", value)
