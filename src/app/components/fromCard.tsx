@@ -15,7 +15,6 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
     const [dropDownOpen, setDropDownOpen] = useState(false);
     const [balance, setBalance] = useState<number | null>(null);
     const [activeMaxButton, setActiveMaxButton] = useState(false);
-    const [insufficientFounds, setInsufficientFunds] = useState(false)
     const { publicKey } = useWallet();
     const { connection } = useConnection();
     const balanceText = publicKey && balance != null ? `${balance.toFixed(2)} ${currency}` : "---"
@@ -26,22 +25,20 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
         if (!publicKey) return;
          
         async function fetchBalance() {
-        try{
-            if (currency === "USDC") {
-               const usdcBal = await getUsdBalance(publicKey!,connection)
-               console.log("usdcBal:", usdcBal)
-               setBalance(usdcBal)
-            } else if (currency === "SOL") {
-                const bal= await getSolBalance(publicKey!, connection);
-                console.log("Solbalance:", bal)
-                setBalance(bal);
+            try{
+                if (currency === "USDC") {
+                const usdcBal = await getUsdBalance(publicKey!,connection)
+                setBalance(usdcBal)
+                } else if (currency === "SOL") {
+                    const bal= await getSolBalance(publicKey!, connection);
+                    setBalance(bal);
+                }
+            } catch(err) {
+                console.error("full error:", err);
             }
-        } catch(err) {
-            console.error("full error:", err);
         }
-    }
-    fetchBalance()
-    }, [publicKey, connection, currency])
+        fetchBalance()
+        }, [publicKey, connection, currency])
 
   return (
     <div className='card-base flex flex-col justify-between w-85 h-fit m-4 p-3'>
@@ -96,9 +93,6 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                 setAmountText(value);
                 setAmount(value === "" ? null : Number(value))
                 setActiveMaxButton(false)
-                setInsufficientFunds(balance !== null && parseFloat(value) > balance)
-                console.log("input value", value)
-            
             }}
              />
         </div>
