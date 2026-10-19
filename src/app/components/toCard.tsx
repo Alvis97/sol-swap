@@ -11,9 +11,10 @@ type ToCardProps = {
     currency: string;
     usBalance: number | undefined;
     solBalance: number | undefined;
+    quoteLoading: boolean
 }
 
-function ToCard({newAmount, currency, usBalance, solBalance}: ToCardProps) {
+function ToCard({newAmount, currency, usBalance, solBalance, quoteLoading}: ToCardProps) {
 
         const { publicKey } = useWallet();
         const balance = currency === "USDC" ? usBalance : solBalance
@@ -34,9 +35,13 @@ function ToCard({newAmount, currency, usBalance, solBalance}: ToCardProps) {
         </div>
 
         {/* bottom part */}
-        <div className='flex items-baseline justify-between '>
-    
-            <p className='flex justify-end items-baseline w-100 text-4xl text-[var(--foreground)]/60'>{newAmount ? newAmount.toFixed(2) : "0.00"} <span className='text-xl'>{currency}</span></p>
+        <div className='flex items-baseline justify-end '>
+        { quoteLoading ? (
+            <div className='flex h-10 w-30 rounded-xl bg-neutral-50/10 animate-pulse'></div>
+        ) : (
+            <p className='flex items-baseline justify-end w-100 text-4xl text-[var(--foreground)]/60'> {newAmount ? newAmount.toFixed(2) : "0.00"} <span className='text-xl'>{currency}</span></p>
+
+        ) }
         </div>
     </div>
   )

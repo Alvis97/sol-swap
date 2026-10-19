@@ -33,7 +33,6 @@ function TransactionCard() {
     const [fromCurrency, setFromCurrency] = useState("USDC")
     const toCurrency = fromCurrency === "USDC" ? "SOL" : "USDC"
 
-    const [amountText, setAmountText] = useState("")
     const [fromAmount, setFromAmount] = useState<number | null>(null)
     const [toAmount, setToAmount] = useState<number | null>(null)
 
@@ -45,6 +44,8 @@ function TransactionCard() {
     const [slippageBps, setSlippageBps] = useState<number>(50) //0.5 slippage
     const [minimumReceived, setMinimumReceived] = useState<number | null>(null);
     const [quote, setQuote] = useState<any | null>(null)
+
+    const [ isQuoteLoading, setisQuoteLoading ] = useState(false)
 
     const [isLoading, setIsLoading ] = useState(false)
     const [modalOpen, setModalOpen] = useState(false)
@@ -92,10 +93,13 @@ const buttonStyle: Record<SwapState, string> = {
         if (!fromAmount || !slippageBps ) {
             setToAmount(null)
             setFromAmount(null)
+            setisQuoteLoading(false)
             return
         }    
 
         let cancelled = false
+            setisQuoteLoading(true)
+
 
         const timer = setTimeout(async () => {
 
@@ -113,12 +117,14 @@ const buttonStyle: Record<SwapState, string> = {
 
                 setQuote(q)
                 setToAmount(Number(q.outAmount) / outputDecimals)
-                console.log("to amount:", toAmount)
                 setMinimumReceived(Number(q.otherAmountThreshold) / outputDecimals)
+            
             } catch (err) {
                 console.log(err)
-            }   
-        }, 1000)
+            } finally {
+                if (!cancelled) setisQuoteLoading(false)
+            } 
+        }, 500)
     
         return () => {
             cancelled = true
@@ -279,12 +285,13 @@ const buttonStyle: Record<SwapState, string> = {
        currency={toCurrency}
        usBalance={usBalance}
        solBalance={solBalance}
+       quoteLoading={isQuoteLoading}    
        />
 
        <InfoCard 
         transactionFee={BASE_FEE_SOL}
         slippageBps={slippageBps}
-        minimumReceived={minimumReceived}    
+        minimumReceived={minimumReceived}
         />
 
         <button
