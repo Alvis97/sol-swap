@@ -37,7 +37,7 @@ function ToCard({newAmount, currency, usBalance, solBalance, quoteLoading}: ToCa
         {/* bottom part */}
         <div className='flex items-baseline justify-end '>
         { quoteLoading ? (
-            <div className='flex h-10 w-30 rounded-xl bg-neutral-50/10 animate-pulse'></div>
+            <div className='flex h-10 w-30 rounded-xl bg-neutral-300 dark:bg-neutral-50/10 animate-pulse'></div>
         ) : (
             <p className='flex items-baseline justify-end w-100 text-4xl text-[var(--foreground)]/60'> {newAmount ? newAmount.toFixed(2) : "0.00"} <span className='text-xl'>{currency}</span></p>
 
