@@ -14,7 +14,6 @@ export async function getQuote(
     slippageBps: slippageBps.toString(),
   })
 
-  console.log("params: ", inputMint, outputMint, amount, slippageBps);
     const response = await fetch(`/api/quote?${params}`
     )
 
