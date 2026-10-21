@@ -9,7 +9,7 @@ import ToCard from './toCard';
 import { getSolPrices } from '../../../lib/prices';
 import InfoCard from './infoCard';
 import SwapInfo from './swapInfo';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, LoaderCircle } from 'lucide-react';
 import { getQuote, SOL_MINT, USDC_MINT } from '../../../lib/jupiter'
 import { PublicKey } from '@solana/web3.js';
 import { VersionedTransaction } from '@solana/web3.js'
@@ -73,18 +73,18 @@ function TransactionCard() {
 
 const buttonText: Record<SwapState, string> = {
   connect: "Connect wallet",
-  loading: "Swapping...",
-  enter: "Swap Token",
+  loading: "Swapping ",
+  enter: "Amount required",
   insufficient: "Insufficient balance",
   ready: "Swap Token",
 }
 
 const buttonStyle: Record<SwapState, string> = {
-  connect: "bg-violet-800 text-white hover:bg-violet-700",
-  ready: "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer",
-  loading: "card-inside text-[var(--foreground)]/50 cursor-not-allowed animate-pulse",
-  enter: "button-base text-[var(--foreground)]/50 cursor-not-allowed",
-  insufficient: "button-base bg-red-800 cursor-not-allowed",
+  connect: "button-base border border-violet-800 bg-[var(--focusRing)] text-violet-800 hover:bg-violet-800 hover:text-white",
+  ready: "button-base border border-emerald-700 bg-[var(--focusRing)] text-emerald-600 hover:bg-emerald-500 hover:text-white cursor-pointer",
+  loading: "card-inside bg-[var(--submitBtn)]  text-[var(--foreground)]/90 cursor-not-allowed animate-pulse",
+  enter: "border text-[var(--foreground)]/40 cursor-not-allowed",
+  insufficient: "card-base border rounded-xl border-red-600 text-red-500 cursor-not-allowed",
 }
   
 
@@ -251,6 +251,7 @@ const buttonStyle: Record<SwapState, string> = {
                     setModalOpen(true)
                     setMinimumReceived(null)
 
+
                 } catch(err) {
                     console.error("Swap failed:", err)
                     setSwapError(err instanceof Error ? err.message : "Something went wrong")
@@ -307,11 +308,12 @@ const buttonStyle: Record<SwapState, string> = {
         />
 
         <button
-        className={`p-3 m-3 w-80 rounded-2xl font-semibold transition ${buttonStyle[swapState]}`}
+        className={`p-3 m-3 w-80 flex justify-center items-center rounded-2xl font-semibold transition ${buttonStyle[swapState]}`}
         onClick={handleSwap}
         disabled={isLoading || isNotReady}
         >
         {buttonText[swapState]}
+        { swapState === "loading" && ( <LoaderCircle size={16} className='animate-spin'/> ) }
         </button>
 
 

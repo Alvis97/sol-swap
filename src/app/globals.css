@@ -92,15 +92,15 @@ input::placeholder {
     @apply rounded-2xl transition-all font-bold tracking-widest duration-300 bg-[var(--submitBtn)];
 
     box-shadow:
-      -6px -6px 12px rgba(255, 255, 255, 0.8),  
-      6px  6px 12px rgba(0, 0, 0, 0.35);       
+      -4px -4px 10px rgba(255, 255, 255, 0.8),  
+      2px  3px 7px rgba(0, 0, 0, 0.37);       
   }
 
   .button-submit:hover {
     background-color: #bcbaba !important;
      box-shadow:
-      -6px -6px 12px rgba(255, 255, 255, 0.8),  
-      6px  6px 12px rgba(0, 0, 0, 0.45);       
+      -4px -4px 10px rgba(255, 255, 255, 0.8),  
+      4px  4px 10px rgba(0, 0, 0, 0.45);       
   }
   }
 
@@ -113,7 +113,6 @@ input::placeholder {
        4px  4px 10px rgba(0, 0, 0, 0.782);
   }
 }
-
 
 
 @layer components {
