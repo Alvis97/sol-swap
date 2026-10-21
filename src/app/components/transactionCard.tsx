@@ -301,11 +301,15 @@ const buttonStyle: Record<SwapState, string> = {
        quoteLoading={isQuoteLoading}    
        />
 
+       { publicKey && connection && (
        <InfoCard 
         transactionFee={BASE_FEE_SOL}
         slippageBps={slippageBps}
         minimumReceived={minimumReceived}
         />
+       )}
+
+
 
         <button
         className={`p-3 m-3 w-80 flex justify-center items-center rounded-2xl font-semibold transition ${buttonStyle[swapState]}`}
@@ -337,6 +341,8 @@ const buttonStyle: Record<SwapState, string> = {
                 error={swapError}
             />
         )}
+
+        <p>Demo, use small amount. Runs on Mainnet!</p>
 
     </div>
   )
