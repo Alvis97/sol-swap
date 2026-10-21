@@ -5,20 +5,23 @@ type FromCardProps = {
     setAmount: (amount: number | null) => void
     currency: string
     setCurrency: (currency: string) => void
+    amountText: string
+    setAmountText: (amountText: string) => void
+    activeMaxButton: boolean
+    setActiveMaxButton: (activeMaxButton: boolean) => void
 }
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import React, { useEffect, useState } from 'react'
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
+import { CircleDollarSign } from 'lucide-react'
 
-function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
+function FromCard({ amount, setAmount, currency, setCurrency, amountText, setAmountText, activeMaxButton, setActiveMaxButton  }: FromCardProps) {
     const [dropDownOpen, setDropDownOpen] = useState(false);
     const [balance, setBalance] = useState<number | null>(null);
-    const [activeMaxButton, setActiveMaxButton] = useState(false);
     const { publicKey } = useWallet();
     const { connection } = useConnection();
     const balanceText = publicKey && balance != null ? `${balance.toFixed(2)} ${currency}` : "---"
-    const [amountText, setAmountText] = useState("")
 
     useEffect(() => {
  
@@ -29,9 +32,15 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                 if (currency === "USDC") {
                 const usdcBal = await getUsdBalance(publicKey!,connection)
                 setBalance(usdcBal)
+                setActiveMaxButton(false)
+                setAmountText("")
+                setAmount(null)
                 } else if (currency === "SOL") {
                     const bal= await getSolBalance(publicKey!, connection);
                     setBalance(bal);
+                    setActiveMaxButton(false)
+                    setAmountText("")
+                    setAmount(null)
                 }
             } catch(err) {
                 console.error("full error:", err);
@@ -39,6 +48,11 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
         }
         fetchBalance()
         }, [publicKey, connection, currency])
+
+        function applyAmount(text: string) {
+           setAmountText(text)
+           setAmount(text === "" ? null : Number(text))
+        }
 
   return (
     <div className='card-base flex flex-col justify-between w-85 h-fit m-4 p-3'>
@@ -50,12 +64,22 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
                 { publicKey && (
                 <button 
                 onClick={()=> {
+                    if (activeMaxButton) {
+                        setActiveMaxButton(false)
+                        setAmountText("")
+                        setAmount(null)
+                        return
+                    }
+
                     if (balance !== null) {
-                        setAmount(balance)
+                        const max = currency === "SOL"
+                        ? Math.max(balance - 0.01, 0)
+                        : Math.floor(balance * 1e6) / 1e6
+                        applyAmount(max.toFixed(6))
                         setActiveMaxButton(true)
                     }  
                 }} 
-                className={ `${activeMaxButton === true ? "card-inside" : "button-base"} rounded-lg  p-2 ml-4`}>
+                className={ `${activeMaxButton === true ? "card-inside" : "card-base"} rounded-lg  p-2 ml-4`}>
                     Max
                 </button>
                 )}
@@ -67,9 +91,10 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
         <div className='flex items-center justify-between '>
             <div className='relative'>
                 <button
-                 className='button-base flex w-17 items-center justify-between p-3 text-xs rounded-lg'
+                 className='button-base flex w-fit items-center justify-between p-3 text-xs rounded-lg'
                  onClick={()=> setDropDownOpen(true)}
                  >{currency}
+                  <CircleDollarSign size={15} className='ml-1'/>
                  </button>
                  {dropDownOpen === true && (
                     <div className='absolute top-full'>
@@ -90,8 +115,7 @@ function FromCard({ amount, setAmount, currency, setCurrency }: FromCardProps) {
             onChange={(e) => {
                 const value = e.target.value.replace(",", ".");
                 if (!/^\d*\.?\d*$/.test(value)) return
-                setAmountText(value);
-                setAmount(value === "" ? null : Number(value))
+                applyAmount(value);
                 setActiveMaxButton(false)
             }}
              />

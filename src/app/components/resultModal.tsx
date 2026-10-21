@@ -67,7 +67,7 @@ function ResultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
         )}
 
         {!success && error && (
-          <p className='text-sm text-red-400 text-center max-h-24 overflow-y-auto'>The price moved too much. Try again or increase slippage</p>
+          <p className='text-sm text-center max-h-24 overflow-y-auto'>The price moved too much. Try again or increase slippage</p>
         )}
 
         {success && txid && (
@@ -83,7 +83,8 @@ function ResultModal({ isOpen, onClose, success, txid, fromAmount, fromCurrency,
 
         <button 
         className='button-submit p-2 mt-2 w-full '
-        onClick={onClose}>
+        onClick={onClose}
+        >
           Close
         </button>
 

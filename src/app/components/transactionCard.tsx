@@ -35,15 +35,17 @@ function TransactionCard() {
 
     const [fromAmount, setFromAmount] = useState<number | null>(null)
     const [toAmount, setToAmount] = useState<number | null>(null)
-
     const [usBalance, setUsBalance] = useState<number>();
     const [solBalance, setSolBalance] = useState<number>();
-    const [newBalance, setNewBalance] = useState<number | null>(null);
-
+    //const [newBalance, setNewBalance] = useState<number | null>(null);
     const [solPrice, setSolPrice] = useState<number | null>(null)
     const [slippageBps, setSlippageBps] = useState<number>(50) //0.5 slippage
     const [minimumReceived, setMinimumReceived] = useState<number | null>(null);
     const [quote, setQuote] = useState<any | null>(null)
+
+    //Fromcard
+    const [amountText, setAmountText] = useState("")
+    const [activeMaxButton, setActiveMaxButton] = useState(false);
 
     const [ isQuoteLoading, setisQuoteLoading ] = useState(false)
 
@@ -92,7 +94,8 @@ const buttonStyle: Record<SwapState, string> = {
  
         if (!fromAmount || !slippageBps ) {
             setToAmount(null)
-            setFromAmount(null)
+            //setFromAmount(null)
+            setMinimumReceived(null)
             setisQuoteLoading(false)
             return
         }    
@@ -170,12 +173,15 @@ const buttonStyle: Record<SwapState, string> = {
         //Switch cards
         function SwitchCards() {
             setFromCurrency(toCurrency)
-            setFromAmount(toAmount)
+            setFromAmount(null)
+            setToAmount(null)
+            setAmountText("")
+            setActiveMaxButton(false)
         }
 
         //Handle swap click
         function handleSwap() {
-              console.log("clicked, publicKey:", publicKey?.toString())
+
             if(!publicKey) {
                 setVisible(true)
                 return
@@ -193,6 +199,8 @@ const buttonStyle: Record<SwapState, string> = {
                     const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
                     const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
                     const amount = (fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
+
+                    console.log(fromAmount, toAmount);
 
                     //get quote step 1
                     const quote = await getQuote(inputMint, outputMint, amount, slippageBps)
@@ -263,11 +271,15 @@ const buttonStyle: Record<SwapState, string> = {
           solPrice={solPrice}
         />
 
-       <FromCard
+       <FromCard 
        amount={fromAmount}
        setAmount={setFromAmount}
        currency={fromCurrency}
        setCurrency={setFromCurrency}
+       amountText={amountText}
+       setAmountText={setAmountText}
+       activeMaxButton={activeMaxButton}
+       setActiveMaxButton={setActiveMaxButton}
        />
 
         <div className='relative flex flex-row justify-between items-center w-[90%] py-0'>
