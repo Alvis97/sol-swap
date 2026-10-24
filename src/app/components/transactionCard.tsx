@@ -22,7 +22,6 @@ const DECIMALS: Record<string, number> = {
   USDC: 1e6,
 }
 
-type SwapState = "connect" | "loading" | "enter" | "insufficient" | "ready"
 
 function TransactionCard() {
     const { publicKey, signTransaction } = useWallet()
