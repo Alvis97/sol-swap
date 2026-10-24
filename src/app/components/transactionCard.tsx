@@ -22,6 +22,7 @@ const DECIMALS: Record<string, number> = {
   USDC: 1e6,
 }
 
+type SwapState = "connect" | "loading" | "enter" | "insufficient" | "limit" | "ready"
 
 function TransactionCard() {
     const { publicKey, signTransaction } = useWallet()
@@ -59,6 +60,17 @@ function TransactionCard() {
     const balance = fromCurrency === "USDC" ? usBalance : solBalance
     const insufficientFunds = balance != null && fromAmount != null && fromAmount > balance
     const isNotReady = isConnected && (!fromAmount || insufficientFunds)
+    
+    const MAX_USD = 5
+
+    const maxAmount = 
+        fromCurrency === "USDC" 
+            ? MAX_USD
+            : solPrice != null
+            ? MAX_USD / solPrice
+            : null
+
+    const exceedsLimit = fromAmount != null && maxAmount != null && fromAmount > maxAmount
 
     const swapState: SwapState = !isConnected
   ? "connect"
@@ -68,6 +80,8 @@ function TransactionCard() {
   ? "enter"
   : insufficientFunds
   ? "insufficient"
+  : exceedsLimit
+  ? "limit"
   : "ready"
 
 const buttonText: Record<SwapState, string> = {
@@ -75,6 +89,7 @@ const buttonText: Record<SwapState, string> = {
   loading: "Swapping ",
   enter: "Amount required",
   insufficient: "Insufficient balance",
+  limit: "Max $2 per swap(demo)",
   ready: "Swap Token",
 }
 
@@ -83,6 +98,7 @@ const buttonStyle: Record<SwapState, string> = {
   ready: "button-base border border-emerald-700 bg-[var(--focusRing)] text-emerald-600 hover:bg-emerald-500 hover:text-white cursor-pointer",
   loading: "card-inside bg-[var(--submitBtn)]  text-[var(--foreground)]/90 cursor-not-allowed animate-pulse",
   enter: "border text-[var(--foreground)]/40 cursor-not-allowed",
+  limit: "card-base border rounded-xl border-red-600 text-red-500 cursor-not-allowed",
   insufficient: "card-base border rounded-xl border-red-600 text-red-500 cursor-not-allowed",
 }
   
@@ -249,7 +265,6 @@ const buttonStyle: Record<SwapState, string> = {
                     setSwapSuccess(true)
                     setModalOpen(true)
                     setMinimumReceived(null)
-
 
                 } catch(err) {
                     console.error("Swap failed:", err)
