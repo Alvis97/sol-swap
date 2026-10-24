@@ -9,6 +9,7 @@ type FromCardProps = {
     setAmountText: (amountText: string) => void
     activeMaxButton: boolean
     setActiveMaxButton: (activeMaxButton: boolean) => void
+    maxAmount: number | null
 }
 
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -16,7 +17,7 @@ import React, { useEffect, useState } from 'react'
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
 import { CircleDollarSign } from 'lucide-react'
 
-function FromCard({ amount, setAmount, currency, setCurrency, amountText, setAmountText, activeMaxButton, setActiveMaxButton  }: FromCardProps) {
+function FromCard({ amount, setAmount, currency, setCurrency, amountText, setAmountText, activeMaxButton, setActiveMaxButton, maxAmount  }: FromCardProps) {
     const [dropDownOpen, setDropDownOpen] = useState(false);
     const [balance, setBalance] = useState<number | null>(null);
     const { publicKey } = useWallet();
@@ -71,14 +72,19 @@ function FromCard({ amount, setAmount, currency, setCurrency, amountText, setAmo
                         return
                     }
 
-                    if (balance !== null) {
-                        const max = currency === "SOL"
+                    if (balance == null || maxAmount == null) return 
+
+                    const spendable = currency === "SOL"
                         ? Math.max(balance - 0.01, 0)
-                        : Math.floor(balance * 1e6) / 1e6
-                        applyAmount(max.toFixed(6))
-                        setActiveMaxButton(true)
+                        : balance
+
+                    const max = Math.min(spendable, maxAmount)
+                    applyAmount((Math.floor(max * 1e6) / 1e6).toFixed(6))
+                    setActiveMaxButton(true)
                     }  
-                }} 
+
+
+                } 
                 className={ `${activeMaxButton === true ? "card-inside" : "card-base"} rounded-lg  p-2 ml-4`}>
                     Max
                 </button>

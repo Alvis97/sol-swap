@@ -295,6 +295,7 @@ const buttonStyle: Record<SwapState, string> = {
        setAmountText={setAmountText}
        activeMaxButton={activeMaxButton}
        setActiveMaxButton={setActiveMaxButton}
+       maxAmount={maxAmount}
        />
 
         <div className='relative flex flex-row justify-between items-center w-[90%] py-0'>
