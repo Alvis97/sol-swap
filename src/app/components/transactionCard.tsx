@@ -61,7 +61,7 @@ function TransactionCard() {
     const insufficientFunds = balance != null && fromAmount != null && fromAmount > balance
     const isNotReady = isConnected && (!fromAmount || insufficientFunds)
     
-    const MAX_USD = 5
+    const MAX_USD = 2
 
     const maxAmount = 
         fromCurrency === "USDC" 
@@ -95,7 +95,7 @@ const buttonText: Record<SwapState, string> = {
 
 const buttonStyle: Record<SwapState, string> = {
   connect: "button-base border border-violet-800 bg-[var(--focusRing)] text-violet-800 hover:bg-violet-800 hover:text-white",
-  ready: "button-base border border-emerald-700 bg-[var(--focusRing)] text-emerald-600 hover:bg-emerald-500 hover:text-white cursor-pointer",
+  ready: "button-base border border-emerald-700 bg-[var(--focusRing)] text-emerald-600 hover:bg-emerald-500 hover:text-white cursor-pointer dark:border-emerald-600 dark:text-emerald-600",
   loading: "card-inside bg-[var(--submitBtn)]  text-[var(--foreground)]/90 cursor-not-allowed animate-pulse",
   enter: "border text-[var(--foreground)]/40 cursor-not-allowed",
   limit: "card-base border rounded-xl border-red-600 text-red-500 cursor-not-allowed",
