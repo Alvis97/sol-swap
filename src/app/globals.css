@@ -106,7 +106,7 @@ input::placeholder {
 
  @media (prefers-color-scheme: dark) {
   .button-submit {
-    background-color:#1e1e1e;;
+    background-color:#5b5b5b;;
     color: white;
     box-shadow:
       -4px -4px 10px rgba(255, 255, 255, 0.10),
