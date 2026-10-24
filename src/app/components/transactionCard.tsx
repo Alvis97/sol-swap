@@ -70,7 +70,7 @@ function TransactionCard() {
             ? MAX_USD / solPrice
             : null
 
-    const exceedsLimit = fromAmount != null && maxAmount != null && fromAmount > maxAmount
+    const exceedsLimit =  fromAmount != null && maxAmount != null && fromAmount > maxAmount
 
     const swapState: SwapState = !isConnected
   ? "connect"
