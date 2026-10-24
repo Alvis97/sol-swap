@@ -18,7 +18,7 @@ export async function getQuote(
     )
 
     if (!response.ok) {
-        throw new Error(`Quote failed: {reponse.status}`)
+        throw new Error(`Quote failed: {response.status}`)
     }
 
     return response.json()

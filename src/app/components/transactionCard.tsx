@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import SwapCard from './fromCard'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
 import FromCard from './fromCard';
@@ -11,7 +10,6 @@ import InfoCard from './infoCard';
 import SwapInfo from './swapInfo';
 import { ArrowUpDown, LoaderCircle } from 'lucide-react';
 import { getQuote, SOL_MINT, USDC_MINT } from '../../../lib/jupiter'
-import { PublicKey } from '@solana/web3.js';
 import { VersionedTransaction } from '@solana/web3.js'
 import ResultModal from './resultModal';
 import { verifySwapTx } from '../../../lib/verifyTx';
@@ -37,7 +35,6 @@ function TransactionCard() {
     const [toAmount, setToAmount] = useState<number | null>(null)
     const [usBalance, setUsBalance] = useState<number>();
     const [solBalance, setSolBalance] = useState<number>();
-    //const [newBalance, setNewBalance] = useState<number | null>(null);
     const [solPrice, setSolPrice] = useState<number | null>(null)
     const [slippageBps, setSlippageBps] = useState<number>(50) //0.5 slippage
     const [minimumReceived, setMinimumReceived] = useState<number | null>(null);
@@ -59,7 +56,7 @@ function TransactionCard() {
     const isConnected = !!publicKey
     const balance = fromCurrency === "USDC" ? usBalance : solBalance
     const insufficientFunds = balance != null && fromAmount != null && fromAmount > balance
-    const isNotReady = isConnected && (!fromAmount || insufficientFunds)
+
     
     const MAX_USD = 2
 
@@ -70,7 +67,16 @@ function TransactionCard() {
             ? MAX_USD / solPrice
             : null
 
-    const exceedsLimit =  fromAmount != null && maxAmount != null && fromAmount > maxAmount
+    const exceedsLimit = isConnected && fromAmount != null && maxAmount != null && fromAmount > maxAmount
+
+    const estimate =
+  solPrice && fromAmount
+    ? fromCurrency === "USDC"
+      ? fromAmount / solPrice
+      : fromAmount * solPrice
+    : null
+
+const shownTo = isConnected ? toAmount : estimate
 
     const swapState: SwapState = !isConnected
   ? "connect"
@@ -107,9 +113,8 @@ const buttonStyle: Record<SwapState, string> = {
     useEffect(() => {
         const fromAmountNum = (fromAmount);
  
-        if (!fromAmount || !slippageBps ) {
+        if (!isConnected || exceedsLimit || !fromAmount || !slippageBps ) {
             setToAmount(null)
-            //setFromAmount(null)
             setMinimumReceived(null)
             setisQuoteLoading(false)
             return
@@ -148,7 +153,7 @@ const buttonStyle: Record<SwapState, string> = {
             cancelled = true
             clearTimeout(timer)
         }
-        }, [fromAmount, fromCurrency, slippageBps])
+        }, [fromAmount, fromCurrency, slippageBps, isConnected, exceedsLimit])
 
 
         //Fetch SOL-prices
@@ -168,6 +173,7 @@ const buttonStyle: Record<SwapState, string> = {
 
         //fetch USDC balance 
         useEffect(() => {
+            if (!publicKey) return
             async function fetchBalance() {
                 const usdcBal = await getUsdBalance(publicKey!, connection)
                 setUsBalance(usdcBal);
@@ -177,6 +183,7 @@ const buttonStyle: Record<SwapState, string> = {
 
         //fetch SOL balance 
         useEffect(() => {
+            if (!publicKey) return
             async function fetchBalance() {
                 const solBal = await getSolBalance(publicKey!, connection)
                 setSolBalance(solBal);
@@ -213,13 +220,10 @@ const buttonStyle: Record<SwapState, string> = {
                 try {
                     const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
                     const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
-                    const amount = (fromAmount) * (fromCurrency === "USDC" ? 1e6 : 1e9)
-
-                    console.log(fromAmount, toAmount);
+                  const amount = Math.floor(fromAmount * (fromCurrency === "USDC" ? 1e6 : 1e9))
 
                     //get quote step 1
                     const quote = await getQuote(inputMint, outputMint, amount, slippageBps)
-                    console.log("Step one done", quote);
 
                     //get swaptransaction from jupiter step 2
                     const swapRes = await fetch("/api/swap", {
@@ -237,30 +241,25 @@ const buttonStyle: Record<SwapState, string> = {
                         }
 
                         const { swapTransaction } = await swapRes.json()
-                    console.log("step 2 done", swapRes);
 
                     //Convert transaction step 3
                     const transaction = VersionedTransaction.deserialize(
                         Buffer.from(swapTransaction, "base64")
                     )
-                    console.log("Step 3 done", transaction)
 
                     verifySwapTx(transaction, publicKey)
 
                     //Sign Transaction step 4
                     const signedTx = await signTransaction(transaction)
-                    console.log("Step 4 done", signedTx);
 
                     //send transaction step 5
                     const txid = await connection.sendRawTransaction(signedTx.serialize())
-                    console.log("step 5 done", txid);
 
                     // confirm transaction step 6
                     const res = await connection.confirmTransaction(txid, "confirmed")
                     if (res.value.err) {
                         throw new Error("Transaction failed on-chain")
                     }
-                    console.log("Successfull Swap step 6", txid)
                     setTxid(txid)
                     setSwapSuccess(true)
                     setModalOpen(true)
@@ -309,11 +308,12 @@ const buttonStyle: Record<SwapState, string> = {
         </div>
         
        <ToCard
-       newAmount={toAmount}
+       //newAmount={toAmount}
        currency={toCurrency}
        usBalance={usBalance}
        solBalance={solBalance}
-       quoteLoading={isQuoteLoading}    
+       quoteLoading={isQuoteLoading}  
+       shownTo={shownTo}  
        />
 
        { publicKey && connection && (
@@ -329,7 +329,7 @@ const buttonStyle: Record<SwapState, string> = {
         <button
         className={`p-3 m-3 w-80 flex justify-center items-center rounded-2xl font-semibold transition ${buttonStyle[swapState]}`}
         onClick={handleSwap}
-        disabled={isLoading || isNotReady}
+        disabled={swapState !== "connect" && swapState !== "ready"}
         >
         {buttonText[swapState]}
         { swapState === "loading" && ( <LoaderCircle size={16} className='animate-spin'/> ) }
@@ -338,12 +338,14 @@ const buttonStyle: Record<SwapState, string> = {
 
         { modalOpen && (
             <ResultModal
-                isOpen={modalOpen}
-                  onClose={() => {
+            isOpen={modalOpen}
+            onClose={() => {
                 setModalOpen(false)
                 if (swapSuccess) {
                 setToAmount(null)
                 setFromAmount(null)
+                setAmountText("")
+                setActiveMaxButton(false)
                 setMinimumReceived(null)
                 }
             }}

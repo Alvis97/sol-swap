@@ -7,16 +7,18 @@ import { getSolPrices } from '../../../lib/prices';
 import { stringify } from 'querystring';
 
 type ToCardProps = {
-    newAmount: number | null;
+    //newAmount: number | null;
     currency: string;
     usBalance: number | undefined;
     solBalance: number | undefined;
-    quoteLoading: boolean
+    quoteLoading: boolean;
+    shownTo: number | null
 }
 
-function ToCard({newAmount, currency, usBalance, solBalance, quoteLoading}: ToCardProps) {
+function ToCard({ currency, usBalance, solBalance, quoteLoading, shownTo }: ToCardProps) {
 
         const { publicKey } = useWallet();
+        const isConnected = !!publicKey
         const balance = currency === "USDC" ? usBalance : solBalance
 
   return (
@@ -25,7 +27,7 @@ function ToCard({newAmount, currency, usBalance, solBalance, quoteLoading}: ToCa
         <div className='flex justify-between items-center text-xs'>
             <p className='font-extrabold'>To</p>
             <div className='flex items-center'>
-                { publicKey && (
+                { isConnected && (
                 <p>
                     Balance: {(balance ?? 0).toFixed(2)} {currency}
                 </p>
@@ -39,9 +41,14 @@ function ToCard({newAmount, currency, usBalance, solBalance, quoteLoading}: ToCa
         { quoteLoading ? (
             <div className='flex h-10 w-30 rounded-xl bg-neutral-300 dark:bg-neutral-50/10 animate-pulse'></div>
         ) : (
-            <p className='flex items-baseline justify-end w-100 text-4xl text-[var(--foreground)]/60'> {newAmount ? newAmount.toFixed(2) : "0.00"} <span className='text-xl'>{currency}</span></p>
+        <p className='flex items-baseline justify-end w-100 text-4xl text-[var(--foreground)]/60'> 
+            {shownTo != null 
+                ? `${!isConnected ? "≈ " : ""}${shownTo.toFixed(4)}`
+                 : "0.00"}
+            <span className='text-xl'>{currency}</span></p>
 
         ) }
+    
         </div>
     </div>
   )
