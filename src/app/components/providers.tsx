@@ -18,7 +18,7 @@ export default function Providers({ children } : { children: ReactNode; }) {
 
   return (
       <ConnectionProvider endpoint={endpoint ?? "https://api.mainnet-beta.solana.com"}>
-        <WalletProvider wallets={wallets}>
+        <WalletProvider wallets={wallets} autoConnect>
           <WalletModalProvider>  
           {children}
         </WalletModalProvider>
