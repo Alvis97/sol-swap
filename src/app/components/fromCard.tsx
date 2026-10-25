@@ -1,6 +1,7 @@
 "use client"
 
 type FromCardProps = {
+    balance: number | null | undefined
     amount: number | null
     setAmount: (amount: number | null) => void
     currency: string
@@ -12,47 +13,24 @@ type FromCardProps = {
     maxAmount: number | null
 }
 
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import React, { useEffect, useState } from 'react'
-import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
+import { useWallet } from '@solana/wallet-adapter-react';
+import React, { useState } from 'react'
 import { CircleDollarSign } from 'lucide-react'
 
-function FromCard({ amount, setAmount, currency, setCurrency, amountText, setAmountText, activeMaxButton, setActiveMaxButton, maxAmount  }: FromCardProps) {
+function FromCard({ balance, amount, setAmount, currency, setCurrency, amountText, setAmountText, activeMaxButton, setActiveMaxButton, maxAmount  }: FromCardProps) {
     const [dropDownOpen, setDropDownOpen] = useState(false);
-    const [balance, setBalance] = useState<number | null>(null);
     const { publicKey } = useWallet();
-    const { connection } = useConnection();
     const balanceText = publicKey && balance != null ? `${balance.toFixed(2)} ${currency}` : "---"
-
-    useEffect(() => {
  
-        if (!publicKey) return;
-         
-        async function fetchBalance() {
-            try{
-                if (currency === "USDC") {
-                const usdcBal = await getUsdBalance(publicKey!,connection)
-                setBalance(usdcBal)
-                setActiveMaxButton(false)
-                setAmountText("")
-                setAmount(null)
-                } else if (currency === "SOL") {
-                    const bal= await getSolBalance(publicKey!, connection);
-                    setBalance(bal);
-                    setActiveMaxButton(false)
-                    setAmountText("")
-                    setAmount(null)
-                }
-            } catch(err) {
-                console.error("full error:", err);
-            }
-        }
-        fetchBalance()
-        }, [publicKey, connection, currency])
 
         function applyAmount(text: string) {
            setAmountText(text)
            setAmount(text === "" ? null : Number(text))
+        }
+
+        function resetAmount() {
+            setActiveMaxButton(false)
+            applyAmount("")
         }
 
   return (
@@ -66,9 +44,7 @@ function FromCard({ amount, setAmount, currency, setCurrency, amountText, setAmo
                 <button 
                 onClick={()=> {
                     if (activeMaxButton) {
-                        setActiveMaxButton(false)
-                        setAmountText("")
-                        setAmount(null)
+                        resetAmount()
                         return
                     }
 
@@ -106,7 +82,10 @@ function FromCard({ amount, setAmount, currency, setCurrency, amountText, setAmo
                     <div className='absolute top-full'>
                         <button
                         className='button-base rounded-lg w-17 p-3 mt-1'
-                        onClick={()=> {setCurrency(currency === "USDC" ? "SOL" : "USDC"); setDropDownOpen(false)}}>
+                        onClick={()=> {
+                            setCurrency(currency === "USDC" ? "SOL" : "USDC")
+                            setDropDownOpen(false)
+                            resetAmount()}}>
                             {currency === "USDC" ? "SOL" : "USDC"}
                         </button>
                     </div>

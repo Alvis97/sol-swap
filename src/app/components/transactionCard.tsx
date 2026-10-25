@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { getSolBalance, getUsdBalance } from '../../../lib/wallet';
 import FromCard from './fromCard';
@@ -171,26 +171,24 @@ const buttonStyle: Record<SwapState, string> = {
                 return () => clearInterval(interval);
         }, [publicKey, connection])
 
-        //fetch USDC balance 
-        useEffect(() => {
+        //Fetch Balance
+        const fetchBalances = useCallback(async () => {
             if (!publicKey) return
-            async function fetchBalance() {
-                const usdcBal = await getUsdBalance(publicKey!, connection)
-                setUsBalance(usdcBal);
+            try{
+                const [usdc, sol] = await Promise.all([
+                    getUsdBalance(publicKey, connection),
+                    getSolBalance(publicKey, connection),
+                ])
+                setUsBalance(usdc)
+                setSolBalance(sol)
+            } catch(err) {
+              console.error("Failed to fetch balances: ", err)
             }
-           fetchBalance()
         }, [publicKey, connection])
 
-        //fetch SOL balance 
         useEffect(() => {
-            if (!publicKey) return
-            async function fetchBalance() {
-                const solBal = await getSolBalance(publicKey!, connection)
-                setSolBalance(solBal);
-            }
-           fetchBalance()
-        }, [publicKey, connection])
-
+            fetchBalances()
+        }, [fetchBalances])
 
         //Switch cards
         function SwitchCards() {
@@ -215,12 +213,13 @@ const buttonStyle: Record<SwapState, string> = {
         async function ExecudeSwap() {
             if(!publicKey || !signTransaction) return
             if(!fromAmount || !slippageBps ) return
+            if (isLoading) return
 
                 setIsLoading(true)
                 try {
                     const inputMint = fromCurrency === "USDC" ? USDC_MINT : SOL_MINT 
                     const outputMint = fromCurrency === "USDC" ? SOL_MINT : USDC_MINT
-                  const amount = Math.floor(fromAmount * (fromCurrency === "USDC" ? 1e6 : 1e9))
+                    const amount = Math.floor(fromAmount * (fromCurrency === "USDC" ? 1e6 : 1e9))
 
                     //get quote step 1
                     const quote = await getQuote(inputMint, outputMint, amount, slippageBps)
@@ -252,11 +251,23 @@ const buttonStyle: Record<SwapState, string> = {
                     //Sign Transaction step 4
                     const signedTx = await signTransaction(transaction)
 
+                    const latest = await connection.getLatestBlockhash()
+
                     //send transaction step 5
-                    const txid = await connection.sendRawTransaction(signedTx.serialize())
+                    const txid = await connection.sendRawTransaction(signedTx.serialize(), {
+                        skipPreflight: true,
+                        maxRetries: 3,
+                    })
 
                     // confirm transaction step 6
-                    const res = await connection.confirmTransaction(txid, "confirmed")
+                    const res = await connection.confirmTransaction(
+                    {
+                        signature: txid,
+                        blockhash: latest.blockhash,
+                        lastValidBlockHeight: latest.lastValidBlockHeight,
+                    },
+                "confirmed"
+                )
                     if (res.value.err) {
                         throw new Error("Transaction failed on-chain")
                     }
@@ -264,12 +275,14 @@ const buttonStyle: Record<SwapState, string> = {
                     setSwapSuccess(true)
                     setModalOpen(true)
                     setMinimumReceived(null)
+                    fetchBalances()
 
                 } catch(err) {
                     console.error("Swap failed:", err)
                     setSwapError(err instanceof Error ? err.message : "Something went wrong")
                     setSwapSuccess(false)
                     setModalOpen(true)
+                    setMinimumReceived(null)
                 } finally {
                     setIsLoading(false)
 
@@ -286,6 +299,7 @@ const buttonStyle: Record<SwapState, string> = {
         />
 
        <FromCard 
+       balance={balance}
        amount={fromAmount}
        setAmount={setFromAmount}
        currency={fromCurrency}
@@ -324,8 +338,6 @@ const buttonStyle: Record<SwapState, string> = {
         />
        )}
 
-
-
         <button
         className={`p-3 m-3 w-80 flex justify-center items-center rounded-2xl font-semibold transition ${buttonStyle[swapState]}`}
         onClick={handleSwap}
@@ -334,7 +346,6 @@ const buttonStyle: Record<SwapState, string> = {
         {buttonText[swapState]}
         { swapState === "loading" && ( <LoaderCircle size={16} className='animate-spin'/> ) }
         </button>
-
 
         { modalOpen && (
             <ResultModal

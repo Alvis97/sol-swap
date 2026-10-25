@@ -26,7 +26,7 @@ export default function Home() {
           onClick={() => setSelectedCard("swap")}
           className={selectedCard === "swap" ? "text-black" : "text-stone-400"}
           >
-            <ArrowDownUp size={selectedCard === "swap" ? 28 : 24}/>
+            <ArrowDownUp size={selectedCard === "swap" ? 28 : 24} className="text-stone-400"/>
           </button>
 
           <button 
