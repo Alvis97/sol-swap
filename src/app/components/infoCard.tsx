@@ -13,7 +13,7 @@ type InfoCardProps = {
 function InfoCard({ transactionFee, slippageBps, minimumReceived, currency } : InfoCardProps ) {
     const { publicKey } = useWallet();
   return (
-    <div className='card-inside flex flex-col justify-between px-4 py-3 m-3 w-90 text-xs text-[var(--foreground)]/60 leading-5'>
+    <div className='card-inside flex flex-col justify-between px-4 py-3 m-3 w-80 text-xs text-[var(--foreground)]/60 leading-5 sm:w-90'>
         <div className='flex justify-between'>
             <p>Minimum received </p>
             <p>{minimumReceived === null ? "---" : minimumReceived.toFixed(4)} {currency}</p>

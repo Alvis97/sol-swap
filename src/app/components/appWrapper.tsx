@@ -15,7 +15,7 @@ export default function AppWrapper({ children }: Props) {
      <div className='flex flex-col h-full'>
           <Providers>
             <nav className="flex items-center justify-between px-3 h-16 shrink-0">
-              <p className='text-xs'>Demo · Mainnet · Max $2</p>
+              <p className='text-xs w-34 sm:w-fit'>Demo · Mainnet · Max $2</p>
               <WalletButton/>
             </nav>
             <main className='flex-1'>

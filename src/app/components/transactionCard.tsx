@@ -313,11 +313,10 @@ const buttonStyle: Record<SwapState, string> = {
         />
 
         <button 
-        className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40  button-submit rounded-full flex items-center justify-center  p-2 h-10 w-10'
+        className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40  button-submit rounded-full flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11'
         onClick={SwitchCards}>
-            <ArrowUpDown size={22}/>
+            <ArrowUpDown size={22} className='h-4.5 sm:h-6'/>
         </button>
-
             
         <ToCard
         currency={toCurrency}

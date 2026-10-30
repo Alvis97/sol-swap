@@ -25,7 +25,7 @@ function SwapInfo({ slippageBps, setSlippageBps, solPrice }: SwapInfoProps) {
           <p>1 SOL = {solPrice != null ? solPrice.toFixed(2) : '...'} USDC</p>
         </div>
         <button
-          className='flex justify-center items-center button-base text-xs p-3 rounded-xl'
+          className='flex justify-center items-center button-base text-xs p-2 rounded-xl sm:p-3'
           onClick={() => setModalOpen(true)}
           aria-haspopup="dialog"
         >
