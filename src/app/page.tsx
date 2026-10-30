@@ -13,14 +13,14 @@ export default function Home() {
   return (
       <main className="flex flex-col w-full h-full p-2 pb-5 justify-center items-center">
         
-        {/* card display */}
         <div className="flex-1">
           { selectedCard === "swap" && <TransactionCard/>}
           { selectedCard === "history" && <p> HIstory</p>}
         </div>
 
-        {/* bottom navigation */}
-        <div className="card-base flex items-center justify-between p-3 w-25 ">
+
+        {/* bottom navigation coming soon */}
+        {/* <div className="card-base flex items-center justify-between p-3 w-25 ">
 
           <button 
           onClick={() => setSelectedCard("swap")}
@@ -36,7 +36,7 @@ export default function Home() {
             <History size={selectedCard === "history" ? 28 : 24}/>
             </button>
 
-        </div>
+        </div> */}
          
       </main>
   );

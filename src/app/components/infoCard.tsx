@@ -7,34 +7,45 @@ type InfoCardProps = {
     transactionFee: number | null
     slippageBps: number | null
     minimumReceived: number | null
+    currency: string
 }
 
-function InfoCard({ transactionFee, slippageBps, minimumReceived } : InfoCardProps ) {
+function InfoCard({ transactionFee, slippageBps, minimumReceived, currency } : InfoCardProps ) {
     const { publicKey } = useWallet();
   return (
-    <div className='card-inside px-3 py-2 m-3 w-80 text-xs leading-5'>
+    <div className='card-inside flex flex-col justify-between px-4 py-3 m-3 w-90 text-xs text-[var(--foreground)]/60 leading-5'>
+        <div className='flex justify-between'>
+            <p>Minimum received </p>
+            <p>{minimumReceived === null ? "---" : minimumReceived.toFixed(4)} {currency}</p>
+        </div>
+
+        <div className='flex justify-between'>
         <p className='flex items-center gap-1'>
-            Transaction fee 
+            Network fee 
             <span className='relative group'>
                 <CircleQuestionMark size="16px" className='cursor-pointer'/>
-                <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-80 p-2 rounded-md text-xs hidden group-hover:block bg-[var(--background)] border border-gray-200'>
+                <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-80 p-2 rounded-md text-xs hidden group-hover:block bg-[var(--hoverColor)] border border-[var(--borderColor)]'>
                      A small fee charged to process your payment securely.
                 </span> 
             </span>
-          : {!publicKey ? "---" : transactionFee + "SOL"}
         </p>
-        <p className='flex items-center'>
+        <p>{!publicKey ? "---" : transactionFee + " SOL"}</p>
+        </div>
+
+        <div className='flex justify-between'>
+            <p className='flex items-center'>
             Slippage  
-            <span className='relative group'>
-                <CircleQuestionMark size="16px" className='cursor-pointer mx-1'/>
-                <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-80 p-2 rounded-md text-xs hidden group-hover:block bg-[var(--background)] border border-gray-200'>
-                    The difference between the expected price and the actual price
-                    when your transaction is executed. Higher during volatile markets.
+                <span className='relative group'>
+                    <CircleQuestionMark size="16px" className='cursor-pointer mx-1'/>
+                    <span className='absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-80 p-2 rounded-md text-xs hidden group-hover:block bg-[var(--hoverColor)] border border-[var(--borderColor)]'>
+                        The difference between the expected price and the actual price
+                        when your transaction is executed. Higher during volatile markets.
+                    </span>
                 </span>
-            </span>
-            : {slippageBps!/100}%
-        </p>
-        <p>Minimum received: {!publicKey ? "---" : minimumReceived}</p>
+            </p>
+            <p>{slippageBps!/100}%</p>
+        </div>
+
     </div>
   )
 }

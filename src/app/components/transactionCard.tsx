@@ -100,12 +100,12 @@ const buttonText: Record<SwapState, string> = {
 }
 
 const buttonStyle: Record<SwapState, string> = {
-  connect: "button-base border border-violet-800 bg-[var(--focusRing)] text-violet-800 hover:bg-violet-800 hover:text-white",
-  ready: "button-base border border-emerald-700 bg-[var(--focusRing)] text-emerald-600 hover:bg-emerald-500 hover:text-white cursor-pointer dark:border-emerald-600 dark:text-emerald-600",
-  loading: "card-inside bg-[var(--submitBtn)]  text-[var(--foreground)]/90 cursor-not-allowed animate-pulse",
+  connect: "button-connect bg-violet-800 hover:bg-violet-900",
+  ready: "button-connect bg-emerald-700 cursor-pointer dark:bg-emerald-600 hover:bg-emerald-700 dark:text-[var(--foreground)]",
+  loading: "card-inside bg-[var(--submitBtn)] text-[var(--foreground)]/90 cursor-not-allowed animate-pulse",
   enter: "border text-[var(--foreground)]/40 cursor-not-allowed",
   limit: "card-base border rounded-xl border-red-600 text-red-500 cursor-not-allowed",
-  insufficient: "card-base border rounded-xl border-red-600 text-red-500 cursor-not-allowed",
+  insufficient: "card-base border rounded-xl bg-red-600 cursor-not-allowed",
 }
   
 
@@ -298,43 +298,43 @@ const buttonStyle: Record<SwapState, string> = {
           solPrice={solPrice}
         />
 
-       <FromCard 
-       balance={balance}
-       amount={fromAmount}
-       setAmount={setFromAmount}
-       currency={fromCurrency}
-       setCurrency={setFromCurrency}
-       amountText={amountText}
-       setAmountText={setAmountText}
-       activeMaxButton={activeMaxButton}
-       setActiveMaxButton={setActiveMaxButton}
-       maxAmount={maxAmount}
-       />
+        <div className='relative flex flex-col items-center w-[90%] py-0'>
+        <FromCard 
+        balance={balance}
+        amount={fromAmount}
+        setAmount={setFromAmount}
+        currency={fromCurrency}
+        setCurrency={setFromCurrency}
+        amountText={amountText}
+        setAmountText={setAmountText}
+        activeMaxButton={activeMaxButton}
+        setActiveMaxButton={setActiveMaxButton}
+        maxAmount={maxAmount}
+        />
 
-        <div className='relative flex flex-row justify-between items-center w-[90%] py-0'>
-            <hr  className='w-full text-stone-400'/>
-            <button 
-                className='button-submit p-3 mx-3'
-                onClick={SwitchCards}>
-                <ArrowUpDown size={18}/>
-            </button>
-            <hr  className='w-full text-stone-400'/>
-        </div>
-        
-       <ToCard
-       //newAmount={toAmount}
-       currency={toCurrency}
-       usBalance={usBalance}
-       solBalance={solBalance}
-       quoteLoading={isQuoteLoading}  
-       shownTo={shownTo}  
-       />
+        <button 
+        className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40  button-submit rounded-full flex items-center justify-center  p-2 h-10 w-10'
+        onClick={SwitchCards}>
+            <ArrowUpDown size={22}/>
+        </button>
+
+            
+        <ToCard
+        currency={toCurrency}
+        usBalance={usBalance}
+        solBalance={solBalance}
+        quoteLoading={isQuoteLoading}  
+        shownTo={shownTo}  
+        />
+        </div>   
+
 
        { publicKey && connection && (
        <InfoCard 
         transactionFee={BASE_FEE_SOL}
         slippageBps={slippageBps}
         minimumReceived={minimumReceived}
+        currency={toCurrency}
         />
        )}
 
@@ -369,8 +369,6 @@ const buttonStyle: Record<SwapState, string> = {
                 error={swapError}
             />
         )}
-
-        <p>Demo, use small amount. Runs on Mainnet!</p>
 
     </div>
   )

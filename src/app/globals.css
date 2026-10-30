@@ -1,12 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #E7E7E7;
-  --foreground: #343434;
-  --hoverColor: #c1c1c1;
-  --submitBtn: #c6c5c5;
+  --background: rgb(231, 231, 231);
+  --foreground: rgb(52, 52, 52);
+  --hoverColor: rgb(175, 175, 175);
+  --submitBtn: rgb(198, 197, 197);
   --focusRing: rgb(202, 202, 202);
   --inputBgFocus: rgb(222, 222, 222);
+  --darkColor: rgb(218, 218, 218);
+  --lightShadow: rgb(255, 255, 255);
+  --darkShadow: rgb(57, 57, 57);
+  --btnColor: rgb(225, 225, 225);
 }
 
 @theme inline {
@@ -16,17 +20,25 @@
   --color-focusRing: var(--focusRing)
   --color-inputBgFocus: var(--inputBgFocus);
   --font-unbounded: var(--font-unbounded-sans);
-
+  --hover-color: var(--hoverColor);
+  --dark-color: var(--darkColor);
+  --lightShadow: var(--lightShadow);
+  --darkShadow: var(--darkShadow);
+  --btnColor: var(--btnColor);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #343434;
-    --foreground: #E7E7E7;
-    --hoverColor: #4e4e4e;
-    --submitBtn: #6c6c6c;
-    --focusRing: rgba(34, 34, 34, 0.4);
-    --inputBgFocus: rgb(60, 60, 60);
+    --background: rgb(31, 31, 31);
+    --foreground: rgb(213, 213, 213);
+    --hoverColor: rgb(61, 61, 61);
+    --submitBtn: rgb(85, 85, 85);
+    --focusRing: rgba(27, 27, 27, 0.998);
+    --inputBgFocus: rgb(38, 38, 38);
+    --darkColor: rgb(28, 28, 28);
+    --lightShadow: rgb(134, 128, 128, 0.20);
+    --darkShadow: rgb(10, 10, 10, 0.9);
+    --btnColor: rgb(33, 33, 33);
   }
 }
 
@@ -54,19 +66,20 @@ input:focus {
 
 input::placeholder {
   color: var(--foreground);
-  opacity: 0.4;
+  opacity: 1;
 }
 
 @layer components {
   .button-base {
-    @apply rounded-2xl transition-all duration-300 bg-[var(--background)];
-
+    @apply transition-all duration-300 bg-[var(--btnColor)];
+    border: 1px solid var(--focusRing);
     box-shadow:
-      -4px -4px 12px rgba(255, 255, 255, 0.8),  
+      -4px -4px 7px rgba(255, 255, 255, 0.8),  
        4px  4px 12px rgba(0, 0, 0, 0.25);       
   }
 
-   .button-base:hover:not(:disabled) {
+   .button-base:hover:not(:disabled), 
+    .button-base.is-active {
     box-shadow:
     inset 0 -4px 6px rgba(255,255,255,0.8),
     inset 0 4px 6px rgba(0,0,0,0.25);
@@ -75,14 +88,16 @@ input::placeholder {
  @media (prefers-color-scheme: dark) {
   .button-base {
     box-shadow:
-      -4px -4px 5px rgba(163, 163, 163, 0.2),
-       4px  4px 7px rgba(14, 14, 14, 0.782);
+      -3px -3px 4px var(--lightShadow),
+      5px  5px 10px var(--darkShadow);
   }
 
-   .button-base:hover:not(:disabled) {
+    .button-base:hover:not(:disabled),
+    .button-base.is-active {
+    background-color: var(--btnColor);  
     box-shadow:
-    inset 0 -4px 10px rgb(116, 114, 114, 0.3),
-    inset 0 4px 10px rgba(0,0,0,0.70);
+    inset -2px -2px 10px var(--lightShadow),
+    inset 7px 7px 10px var(--darkShadow);
   }
 }
 }
@@ -90,14 +105,14 @@ input::placeholder {
 @layer components {
   .button-submit {
     @apply rounded-2xl transition-all font-bold tracking-widest duration-300 bg-[var(--submitBtn)];
-
+    border: 1px solid var(--focusRing);
     box-shadow:
       -4px -4px 10px rgba(255, 255, 255, 0.8),  
       2px  3px 7px rgba(0, 0, 0, 0.37);       
   }
 
   .button-submit:hover {
-    background-color: #bcbaba !important;
+    background-color: var(--hoverColor) !important;
      box-shadow:
       -4px -4px 10px rgba(255, 255, 255, 0.8),  
       4px  4px 10px rgba(0, 0, 0, 0.45);       
@@ -106,11 +121,77 @@ input::placeholder {
 
  @media (prefers-color-scheme: dark) {
   .button-submit {
-    background-color:#5b5b5b;;
-    color: white;
+   
     box-shadow:
-      -4px -4px 10px rgba(255, 255, 255, 0.10),
-       4px  4px 10px rgba(0, 0, 0, 0.782);
+      -3px -3px 4px var(--lightShadow),
+       5px  5px 10px var(--darkShadow);
+  }
+
+    .button-submit:hover {
+     box-shadow:
+      -5px -5px 7px var(--lightShadow),
+       7px  7px 15px var(--darkShadow);     
+  }
+}
+
+@layer components {
+  .max-btn {
+    @apply transition-all duration-300 bg-[var(--btnColor)];
+    border: 1px solid var(--focusRing);
+    box-shadow:
+      -3px -3px 7px rgba(255, 255, 255, 1),  
+       3px  3px 3px rgba(0, 0, 0, 0.20);       
+  }
+
+   .max-btn:hover:not(:disabled),
+   .max-btn.is-active {
+    box-shadow:
+    inset 0 -4px 6px rgba(255,255,255,0.8),
+    inset 0 4px 6px rgba(0,0,0,0.25);
+  }
+
+ @media (prefers-color-scheme: dark) {
+  .max-btn {
+    box-shadow:
+      -3px -3px 4px var(--lightShadow),
+       5px  5px 10px var(--darkShadow);
+  }
+
+   .max-btn:hover:not(:disabled),
+   .max-btn.is-active {
+    box-shadow:
+    inset -3px -4px 5px var(--lightShadow),
+    inset 4px 4px 4px var(--darkShadow);
+  }
+}
+}
+
+@layer components {
+  .button-connect {
+    @apply rounded-2xl transition-all font-bold tracking-widest duration-300;
+    box-shadow:
+      -4px -4px 10px rgba(255, 255, 255, 0.8),  
+      2px  3px 7px rgba(0, 0, 0, 0.37);       
+  }
+
+  .button-connect:hover {
+     box-shadow:
+      -4px -4px 10px rgba(255, 255, 255, 0.8),  
+      4px  4px 10px rgba(0, 0, 0, 0.45);       
+  }
+  }
+
+ @media (prefers-color-scheme: dark) {
+  .button-connect {
+    box-shadow:
+      -3px -3px 4px rgba(255, 255, 255, 0.247),
+       5px  5px 10px black;
+  }
+
+    .button-connect:hover {
+     box-shadow:
+       inset -3px -3px 4px rgba(255, 255, 255, 0.247),
+       inset 5px  5px 10px black;    
   }
 }
 
@@ -118,7 +199,7 @@ input::placeholder {
 @layer components {
   .card-base {
     @apply rounded-2xl transition-all duration-300 bg-[var(--background)];
-
+    border: 1px solid var(--focusRing);
     box-shadow:
       -6px -6px 12px rgba(255, 255, 255, 0.8),  
        6px  6px 12px rgba(0, 0, 0, 0.25);       
@@ -127,29 +208,8 @@ input::placeholder {
  @media (prefers-color-scheme: dark) {
   .card-base {
     box-shadow:
-      -4px -4px 10px rgba(255, 255, 255, 0.10),
-       4px  4px 10px rgba(0, 0, 0, 0.782);
-  }
-}
-}
-
-
-
-@layer components {
-.card-inset {
-    @apply rounded-2xl transition-all duration-300;
-
-  box-shadow:
-    -6px -6px 12px rgba(255, 255, 255, 0.6),
-     6px  6px 12px rgba(0, 0, 0, 0.163),
-    inset 0 -10px 10px rgba(0, 0, 0, 0.198);
-}
-
- @media (prefers-color-scheme: dark) {
-  .card-inset {
-    box-shadow:
-      -4px -4px 12px rgba(255, 255, 255, 0.111),
-       6px  6px 12px rgba(0, 0, 0, 0.646);
+      -4px -4px 10px var(--lightShadow),
+       7px  7px 7px var(--darkShadow);
   }
 }
 }
@@ -157,9 +217,7 @@ input::placeholder {
 
 @layer components {
 .card-inside {
-  @apply rounded-2xl transition-all duration-300;
-
-  background: rgba(255, 255, 255, 0.227);
+  @apply rounded-2xl transition-all duration-300 bg-[var(--darkColor)] text-[var(--color-foreground)]/78;
 
   box-shadow:
     inset 0 -4px 6px rgba(255,255,255,0.8),
@@ -169,11 +227,27 @@ input::placeholder {
  @media (prefers-color-scheme: dark) {
   .card-inside {
 
-  background: rgba(159, 159, 159, 0.089);
+    box-shadow:
+      inset -4px -4px 7px var(--lightShadow),
+      inset 5px 5px 8px var(--darkShadow);
+  }
+}
+}
+
+@layer components {
+  .drop-down {
+    @apply transition-all duration-300;
 
     box-shadow:
-      inset -2px -2px 8px rgba(255, 255, 255, 0.22),
-      inset 4px 4px 8px rgb(0, 0, 0);
+      -4px -4px 7px rgba(255, 255, 255, 0.8),  
+       4px  4px 12px rgba(0, 0, 0, 0.25);       
+  }
+
+ @media (prefers-color-scheme: dark) {
+  .drop-down {
+    box-shadow:
+      -2px -2px 7px rgba(221, 221, 221, 0.2),
+       4px  4px 4px rgba(14, 14, 14, 0.782);
   }
 }
 }
