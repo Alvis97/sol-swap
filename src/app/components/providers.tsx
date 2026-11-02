@@ -12,8 +12,12 @@ export default function Providers({ children } : { children: ReactNode; }) {
 
     const network = WalletAdapterNetwork.Mainnet
 
-    const endpoint = process.env.NEXT_PUBLIC_HELIUS_RPC_URL ?? "https://api.mainnet-beta.solana.com";
+    const endpoint = process.env.NEXT_PUBLIC_HELIUS_RPC_URL
 
+    if (!endpoint) {
+      throw new Error("NEXT_PUBLIC_HELIUS_RPC_URL is not set")
+    }
+    
     const wallets = useMemo(() => [new PhantomWalletAdapter()], [network])
 
   return (
