@@ -100,7 +100,7 @@ const buttonText: Record<SwapState, string> = {
 }
 
 const buttonStyle: Record<SwapState, string> = {
-  connect: "button-connect bg-violet-800 hover:bg-violet-900",
+  connect: "button-connect bg-violet-800 text-white hover:bg-violet-900",
   ready: "button-connect bg-emerald-700 cursor-pointer dark:bg-emerald-600 hover:bg-emerald-700 dark:text-[var(--foreground)]",
   loading: "card-inside bg-[var(--submitBtn)] text-[var(--foreground)]/90 cursor-not-allowed animate-pulse",
   enter: "border text-[var(--foreground)]/40 cursor-not-allowed",

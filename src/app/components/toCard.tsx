@@ -23,14 +23,14 @@ function ToCard({ currency, usBalance, solBalance, quoteLoading, shownTo }: ToCa
         const balance = currency === "USDC" ? usBalance : solBalance
 
   return (
-        <div className='card-base flex flex-col justify-between w-85 h-38 m-3 p-4 px-4 sm:w-100 sm:h-40'>
+        <div className='card-base flex flex-col justify-between w-85 h-37 m-3 p-4 px-4 sm:w-100 sm:h-40'>
         {/* top part */}
             <div className='flex justify-between items-center text-xs'>
                 <p className='font-extrabold'>You Receive</p>
             </div>
 
             {/* bottom part */}
-            <div className='flex items-baseline justify-between '>
+            <div className='flex items-center justify-between'>
                 { quoteLoading ? (
                     <div className='flex h-10 w-30 rounded-xl bg-neutral-300 dark:bg-neutral-50/10 animate-pulse'></div>
                 ) : (
@@ -41,11 +41,11 @@ function ToCard({ currency, usBalance, solBalance, quoteLoading, shownTo }: ToCa
                     </p>
                 ) }
 
-                <p className='flex text-lg items-center gap-1'>
+                <p className='flex text-lg items-center gap-1 sm:text-2xl'>
                 {currency === "USDC" ? (
-                        <TokenUSDC variant="branded" className="h-6 sm:h-10" />
+                        <TokenUSDC variant="branded" className="h-8 sm:h-10 w-10" />
                     ) : (
-                        <TokenSOL variant="branded" className="h-6 sm:h-10" />
+                        <TokenSOL variant="branded" className="h-8 sm:h-10 w-10" />
                     )}
                 {currency}
                 </p>

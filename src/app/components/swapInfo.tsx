@@ -36,7 +36,7 @@ function SwapInfo({ slippageBps, setSlippageBps, solPrice }: SwapInfoProps) {
       {modalOpen && (
         <div
           onClick={() => setModalOpen(false)}
-          className='fixed inset-0 z-50 flex items-center justify-center bg-stone-500/10 backdrop-blur-md'
+          className='fixed inset-0 z-50 flex items-center justify-center bg-black/20 dark:bg-stone-500/10 backdrop-blur-md'
         >
           <div
             role="dialog"

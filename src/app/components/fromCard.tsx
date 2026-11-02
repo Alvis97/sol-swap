@@ -22,6 +22,7 @@ import { ChevronDown } from 'lucide-react'
 function FromCard({ balance, amount, setAmount, currency, setCurrency, amountText, setAmountText, activeMaxButton, setActiveMaxButton, maxAmount  }: FromCardProps) {
     const [dropDownOpen, setDropDownOpen] = useState(false);
     const { publicKey } = useWallet();
+    const isConnected = !!publicKey
     const balanceText = publicKey && balance != null ? `${balance.toFixed(2)} ${currency}` : "---"
  
 
@@ -36,7 +37,7 @@ function FromCard({ balance, amount, setAmount, currency, setCurrency, amountTex
         }
 
   return (
-    <div className='card-base flex flex-col justify-between w-85 h-38 m-3 p-4 px-4 sm:w-100 sm:h-40'>
+    <div className='card-base flex flex-col justify-between w-85 h-37 m-3 p-4 px-4 sm:w-100 sm:h-40'>
         <p className='flex font-extrabold text-xs'>You Pay</p>
            
         {/* top part */}
@@ -131,7 +132,9 @@ function FromCard({ balance, amount, setAmount, currency, setCurrency, amountTex
                 </button>
                 )}
 
-                 <p className='text-[var(--foreground)]/60 text-xs'>Balance: {balanceText}</p>
+                { isConnected && (
+                    <p className='text-[var(--foreground)]/60 text-xs'> Balance: {balanceText}</p>
+                  )}
                 </div>
             </div>
   )
