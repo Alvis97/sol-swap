@@ -20,6 +20,8 @@ export async function guard(
     kind: "quote" | "swap"
 ): Promise<Response | null> {
     const origin = req.headers.get("origin")
+    console.error("origin check:", JSON.stringify(origin), JSON.stringify(process.env.APP_ORIGIN))   // TEMP: ta bort sen
+
     if (origin && origin !== process.env.APP_ORIGIN) {
         return Response.json({ error: "Forbidden" }, {status: 403 })
     }
