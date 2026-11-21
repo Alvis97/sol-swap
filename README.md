@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sol Swap
 
-## Getting Started
+A SOL ↔ USDC swap app on Solana mainnet, built with Next.js and TypeScript
+using Jupiter's API. A portfolio project with a focus on securing the backend.
 
-First, run the development server:
+**Live demo:** https://sol-swap-beige.vercel.app
+**Demo limit:** swaps are capped at about $2.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<img width="300" alt="SwapGif" src="https://github.com/user-attachments/assets/df1f461e-2243-46b1-976c-05c55a4ed720" />
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
+- Connect a Solana wallet (Phantom)
+- See quotes with or without a connected wallet
+- Manual slippage, fee and estimated amount
+- Loading, error and success states
+- Link to the finished transaction on Solscan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How a swap works
+1. **Quote:** fetch the best price and route from Jupiter
+2. **Build:** Jupiter turns the quote into a transaction (server-side, so the API key stays private)
+3. **Verify:** check the fee payer and every program before anything is signed
+4. **Sign:** the user approves in their wallet, the app never sees the private key
+5. **Send:** broadcast the signed transaction through an RPC node
+6. **Confirm:** wait for the network and check that it didn't fail on-chain
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Security
+- Server-side validation with zod (token allowlist, slippage and amount caps)
+- Rate limiting (Upstash) and origin check
+- Transaction check before signing (fee payer and allowed programs), with tests
+- API key stays on the server, generic error messages
 
-## Learn More
+Details and known limitations: see [SECURITY.md](./SECURITY.md).
 
-To learn more about Next.js, take a look at the following resources:
+## Tech stack
+Next.js, TypeScript, Tailwind, Solana wallet adapter, Jupiter API,
+Helius RPC, Upstash Redis, Vercel, Vitest
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Getting started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Install dependencies
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env.local` and fill in your own values
+3. Run the dev server
+   ```bash
+   npm run dev
+   ```
+4. Open http://localhost:3000
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Environment variables
+| Name | What it is |
+| --- | --- |
+| NEXT_PUBLIC_HELIUS_RPC_URL | RPC endpoint (public, restrict it to your domain) |
+| APP_ORIGIN | Allowed origin for API requests |
+| JUPITER_API_KEY | Jupiter API key (server only) |
+| UPSTASH_REDIS_REST_URL | Upstash Redis URL (rate limiting) |
+| UPSTASH_REDIS_REST_TOKEN | Upstash Redis token |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tests
+npm test
+
+## Disclaimer
+Not affiliated with the Solana Foundation, Circle or Jupiter. Demo only,
+not audited, do not use with real funds beyond the demo limit.
